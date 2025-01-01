@@ -1,4 +1,8 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { 
+	App, Editor, MarkdownView, 
+	Modal, Notice, Plugin, PluginSettingTab, Setting,
+	TFile,
+} from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -13,15 +17,43 @@ const DEFAULT_SETTINGS: CsvPluginSettings = {
 export default class CsvPlugin extends Plugin {
 	settings: CsvPluginSettings;
 
-	testFunction(arg: string): string {
-		return `Test function called with argument: ${arg}`;
+	// testFunction(arg: string): string {
+	// 	return `Test function called with argument: ${arg}`;
+	// }
+
+	// 등록하는 이름 말고 정의한 함수 이름으로 호출됨.
+	async saveFile(app: App, fileName: string, content: string): Promise<void> {
+		const vault = app.vault;
+		await vault.create(fileName, content);
+
+		// 파일이 이미 존재하는지 확인
+		// const existingFile = vault.getAbstractFileByPath(fileName);
+		// if (existingFile instanceof TFile) {
+		// 	// 파일이 존재하면 덮어쓰기
+		// 	await vault.modify(existingFile, content);
+			
+		// } else {
+		// 	// 파일이 존재하지 않으면 새로 생성
+		// 	await vault.create(fileName, content);
+		// }
 	}
 
 	async onload() {
 		await this.loadSettings();
 
-		(window as any).testFunction = this.testFunction;
-
+		// custom 함수 추가.
+		// (window as any).testFunction = this.testFunction;
+		// (window as any).saveFileFromDataview = async (fileName: string, content: string) => {
+		// 	if(!this.app || !this.app.vault) {
+		// 		console.error('app or vault is not ready');
+		// 		return;
+		// 	}
+		// 	try {
+		// 		await this.saveFile(this.app, fileName, content);
+		// 	} catch (error) {
+		// 		console.error(error);
+		// 	}
+        // };
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
@@ -86,7 +118,8 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	onunload() {
-		delete (window as any).testFunction;
+		// delete (window as any).testFunction;
+		delete (window as any).saveFileFromDataview;
 	}
 
 	async loadSettings() {
