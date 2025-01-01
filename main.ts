@@ -13,8 +13,14 @@ const DEFAULT_SETTINGS: CsvPluginSettings = {
 export default class CsvPlugin extends Plugin {
 	settings: CsvPluginSettings;
 
+	testFunction(arg: string): string {
+		return `Test function called with argument: ${arg}`;
+	}
+
 	async onload() {
 		await this.loadSettings();
+
+		(window as any).testFunction = this.testFunction;
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
@@ -80,7 +86,7 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	onunload() {
-
+		delete (window as any).testFunction;
 	}
 
 	async loadSettings() {
