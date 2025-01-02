@@ -1,125 +1,154 @@
 import { 
-	App, Editor, MarkdownView, 
-	Modal, Notice, Plugin, PluginSettingTab, Setting,
+	App, Plugin, PluginSettingTab, Setting,
 	TFile,
 } from 'obsidian';
-
-// Remember to rename these classes and interfaces!
 
 interface CsvPluginSettings {
 	mySetting: string;
 }
-
 const DEFAULT_SETTINGS: CsvPluginSettings = {
 	mySetting: 'default'
+}
+type CSVCell = string | number | null;
+type CSVRow = CSVCell[];
+class CSVTable {
+	private headers: string[];
+    private rows: CSVRow[];
+
+    constructor(headers: string[], rows: CSVRow[] = []) {
+        this.headers = headers;
+        this.rows = rows;
+    }
+
+    getHeaders(): string[] {
+        return this.headers;
+    }
+    getRows(): CSVRow[] {
+        return this.rows;
+    }
+
+    append(row: CSVRow): void {
+        if (row.length !== this.headers.length) {
+            throw new Error(`Row length (${row.length}) must match headers length (${this.headers.length}).`);
+        }
+        this.rows.push(row);
+    }
+    delete(rowIndex: number): void {
+        if (rowIndex < 0 || rowIndex >= this.rows.length) {
+            throw new Error(`Invalid row index: ${rowIndex}`);
+        }
+        this.rows.splice(rowIndex, 1);
+    }
+    updateCell(rowIndex: number, columnName: string, value: CSVCell): void {
+        const columnIndex = this.headers.indexOf(columnName);
+        if (columnIndex === -1) {
+            throw new Error(`Column '${columnName}' does not exist.`);
+        }
+        if (rowIndex < 0 || rowIndex >= this.rows.length) {
+            throw new Error(`Invalid row index: ${rowIndex}`);
+        }
+        this.rows[rowIndex][columnIndex] = value;
+    }
+
+    toCSV(): string {
+        const csvContent = [this.headers.join(",")];
+        for (const row of this.rows) {
+            csvContent.push(row.map(cell => (cell === null ? "" : cell.toString())).join(","));
+        }
+        return csvContent.join("\n");
+    }
+}
+interface CSVFile {
+	name: string;
+	path: string;
+	content: CSVTable;
 }
 
 export default class CsvPlugin extends Plugin {
 	settings: CsvPluginSettings;
 
-	// testFunction(arg: string): string {
-	// 	return `Test function called with argument: ${arg}`;
-	// }
 
-	// 등록하는 이름 말고 정의한 함수 이름으로 호출됨.
-	async saveFile(app: App, fileName: string, content: string): Promise<void> {
+
+	// CsvPlugin.function() 형태로 호출될 함수들.
+
+	private async readCSV(app: App, fileName: string): Promise<CSVTable | null> {
+		if(fileName.endsWith(".csv")) {	// 확장자 검사.
+			const content = await this.loadFile(app, fileName);	// 파일 로드.
+			return await this.parseCSV(content);	// CSV 파싱.
+		}
+		return null;
+	}
+
+	// save, load
+	private async saveFile(app: App, fileName: string, content: string): Promise<void> {
 		const vault = app.vault;
 		await vault.create(fileName, content);
 
-		// 파일이 이미 존재하는지 확인
-		// const existingFile = vault.getAbstractFileByPath(fileName);
-		// if (existingFile instanceof TFile) {
-		// 	// 파일이 존재하면 덮어쓰기
-		// 	await vault.modify(existingFile, content);
-			
-		// } else {
-		// 	// 파일이 존재하지 않으면 새로 생성
-		// 	await vault.create(fileName, content);
-		// }
+		const existingFile = vault.getAbstractFileByPath(fileName);
+		if (existingFile instanceof TFile) {
+			// 파일이 존재하면 덮어쓰기
+			await vault.modify(existingFile, content);
+		} else {
+			// 파일이 존재하지 않으면 새로 생성
+			await vault.create(fileName, content);
+		}
 	}
+	private async loadFile(app: App, fileName: string): Promise<string> {
+		const vault = app.vault;
+		const file = vault.getAbstractFileByPath(fileName);
+		if (file instanceof TFile) {
+			return await vault.read(file);
+		} else {
+			throw new Error('file not found');
+		}
+	}
+
+	parseCSV(content: string): CSVTable {
+        const lines = content.split("\n").map(line => line.trim());
+        const headers = lines.shift()?.split(",") ?? [];
+        const rows = lines.map(line => line.split(",").map(cell => cell.trim()));
+
+        return new CSVTable(headers, rows);
+    }
 
 	async onload() {
 		await this.loadSettings();
 
-		// custom 함수 추가.
-		// (window as any).testFunction = this.testFunction;
-		// (window as any).saveFileFromDataview = async (fileName: string, content: string) => {
-		// 	if(!this.app || !this.app.vault) {
-		// 		console.error('app or vault is not ready');
-		// 		return;
-		// 	}
-		// 	try {
-		// 		await this.saveFile(this.app, fileName, content);
-		// 	} catch (error) {
-		// 		console.error(error);
-		// 	}
-        // };
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
+		// window에서 독립적으로 실행할 함수들.
+		// app을 사용해야 하는 것들은 여기로 들어와있어야 함.
+		(window as any).CSVTable = CSVTable;
+		(window as any).loadCSV = async (fileName: string) => {
+			if(!this.app || !this.app.vault) { 
+				console.error('app or vault is not ready'); return;
 			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
+			try {
+				return await this.readCSV(this.app, fileName);
+			} catch (error) {
+				console.error(error);
+				return null;
 			}
-		});
+		}
 
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
+		(window as any).saveFile = async (fileName: string, content: string) => {
+			if(!this.app || !this.app.vault) {
+				console.error('app or vault is not ready');
+				return;
 			}
-		});
-
+			try {
+				await this.saveFile(this.app, fileName, content);
+			} catch (error) {
+				console.error(error);
+			}
+        };
+		
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CsvSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
 		// delete (window as any).testFunction;
-		delete (window as any).saveFileFromDataview;
+		delete (window as any).saveFile;
 	}
 
 	async loadSettings() {
@@ -128,22 +157,6 @@ export default class CsvPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-	}
-}
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
 	}
 }
 
