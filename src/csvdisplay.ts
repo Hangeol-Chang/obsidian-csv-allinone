@@ -1,9 +1,9 @@
 import { App, Modal } from "obsidian";
-import { CSVRow } from "./types";
+import { CSVRow, CSVTable } from "./types";
 import { readCSV_, saveCSV_ } from "./csvfilemanager";
 import './styles/modal.css';
 
-export const createInputModal = async (app: App, headers: string[], fileName: string) => {
+export const createCsvInputModal_ = async (app: App, headers: string[], fileName: string) => {
     const form = generateForm(headers);
     
     const modal = new Modal(app);
@@ -43,7 +43,10 @@ const generateForm = (headers: string[]): string => {
     return `
         <form id="csv-input-form">
             ${fields.join("\n")}
-            <button type="submit">Submit</button>
+            <div class="button-group">
+                <div></div>
+                <button class="submit-button" type="submit">Submit</button>
+            </div>
         </form>
     `;
 }
@@ -52,6 +55,34 @@ const createInputField = (key: string): string => {
         <div class="form-group">
             <label class="input-key" for="${key}">${key}</label>
             <input class="input-value" type="text" id="${key}" name="${key}"/>
+        </div>
+    `;
+}
+
+export const createCsvTableView_ = (csvTable: CSVTable): string => {
+    const headers = csvTable.getHeaders();
+    const rows = csvTable.getRows();
+
+    const table = rows.map(row => {
+        return `
+            <tr>
+                ${row.map(cell => `<td>${cell}</td>`).join("")}
+            </tr>
+        `;
+    }).join("");
+
+    return `
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        ${headers.map(header => `<th>${header}</th>`).join("")}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${table}
+                </tbody>
+            </table>
         </div>
     `;
 }

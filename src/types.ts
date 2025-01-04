@@ -30,6 +30,7 @@ export class CSVTable {
         if (row.length !== this.headers.length) {
             throw new Error(`Row length (${row.length}) must match headers length (${this.headers.length}).`);
         } else {
+            // console.log(`append row: ${row}`);
             if(Array.isArray(row)) {
                 this.rows.push(row);
             }
@@ -48,7 +49,7 @@ export class CSVTable {
     }
     updateCell(rowIndex: number, columnName: string, value: CSVCell): void {
         const columnIndex = this.headers.indexOf(columnName);
-        if (columnIndex === -1) {
+        if (columnIndex === -1) {   
             throw new Error(`Column '${columnName}' does not exist.`);
         }
         if (rowIndex < 0 || rowIndex >= this.rows.length) {
@@ -63,6 +64,24 @@ export class CSVTable {
             csvContent.push(row.map(cell => (cell === null ? "" : cell.toString())).join(","));
         }
         return csvContent.join("\n");
+    }
+
+    // 실제로 사용하게될 api일지는 모르겠습니다.
+    addColoumn(columnName: string, value: CSVCell = 0): void {
+        this.headers.push(columnName);
+        for (let i = 0; i < this.rows.length; i++) {
+            this.rows[i].push(value);
+        }
+    }
+    deleteColumn(columnName: string): void {
+        const columnIndex = this.headers.indexOf(columnName);
+        if (columnIndex === -1) {
+            throw new Error(`Column '${columnName}' does not exist.`);
+        }
+        this.headers.splice(columnIndex, 1);
+        for (let i = 0; i < this.rows.length; i++) {
+            this.rows[i].splice(columnIndex, 1);
+        }
     }
 }
 export interface CSVFile {

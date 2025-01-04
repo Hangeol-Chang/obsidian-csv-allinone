@@ -1,5 +1,5 @@
 import { readCSV_, saveCSV_} from 'src/csvfilemanager';
-import { createInputModal } from './src/csvdisplay';
+import { createCsvInputModal_, createCsvTableView_ } from './src/csvdisplay';
 import { CSVTable } from './src/types'
 
 import { 
@@ -29,8 +29,12 @@ export default class CsvPlugin extends Plugin {
 
 	//// csvdisplay.ts
 	openCsvInputModal = async (app: App, headers: string[], fileName: string) => {
-		createInputModal(app, headers, fileName);
+		createCsvInputModal_(app, headers, fileName);
 	}
+	createCsvTableView = (csvTable: CSVTable): string => {
+		return createCsvTableView_(csvTable);
+	}
+		
 
 	async onload() {
 		await this.loadSettings();
@@ -39,7 +43,6 @@ export default class CsvPlugin extends Plugin {
 		
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CsvSettingTab(this.app, this));
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 	onunload() {}
 

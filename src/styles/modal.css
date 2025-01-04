@@ -9,6 +9,13 @@
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;
+    padding: 0.5rem;
+}
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1rem;
 }
 
 .input-key {
