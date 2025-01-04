@@ -1,6 +1,7 @@
 import { App, Modal } from "obsidian";
 import { CSVRow } from "./types";
 import { readCSV_, saveCSV_ } from "./csvfilemanager";
+import './styles/modal.css';
 
 export const createInputModal = async (app: App, headers: string[], fileName: string) => {
     const form = generateForm(headers);
@@ -46,11 +47,11 @@ const generateForm = (headers: string[]): string => {
         </form>
     `;
 }
-const createInputField = (fieldName: string): string => {
+const createInputField = (key: string): string => {
     return `
         <div class="form-group">
-            <label for="${fieldName}">${fieldName}</label>
-            <input type="text" id="${fieldName}" name="${fieldName}" class="form-control" />
+            <label class="input-key" for="${key}">${key}</label>
+            <input class="input-value" type="text" id="${key}" name="${key}"/>
         </div>
     `;
 }

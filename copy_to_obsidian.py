@@ -2,10 +2,12 @@ import os
 import shutil
 
 # 경로 설정
-SOURCE_FILES = [
-    'manifest.json', 
-    'main.js'
-]
+SOURCE_FILES = {
+    'manifest.json' : 'manifest.json', 
+    'main.js' : 'main.js',
+    'main.css' : 'styles.css',
+}
+
 OBSIDIAN_DIR = os.path.abspath('../obsidian/.obsidian')
 TARGET_DIR = os.path.join(OBSIDIAN_DIR, 'plugins', 'csv-allinone')
 
@@ -21,13 +23,13 @@ def copy_files():
         os.makedirs(TARGET_DIR, exist_ok=True)
 
     # 파일 복사
-    for file_name in SOURCE_FILES:
-        source_path = os.path.abspath(file_name)
-        target_path = os.path.join(TARGET_DIR, file_name)
+    for source_file, target_file in SOURCE_FILES.items():
+        source_path = os.path.abspath(source_file)
+        target_path = os.path.join(TARGET_DIR, target_file)
 
         if os.path.exists(source_path):
             shutil.copy2(source_path, target_path)
-            print(f"Copied {file_name} to {target_path}")
+            print(f"Copied {source_file} to {target_path}")
         else:
             print(f"Warning: Source file {source_path} not found.")
 
