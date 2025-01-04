@@ -30,7 +30,7 @@ export const createInputModal = async (app: App, headers: string[], fileName: st
         }
         // 파일 저장
         table?.append(newRow);
-        console.log(table);
+        // console.log(table);
         saveCSV_(app, fileName, table);
         modal.close();
     });
