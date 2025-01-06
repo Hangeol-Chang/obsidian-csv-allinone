@@ -1,8 +1,9 @@
 # Obsidian CSV All-in-One
 
+.csv 파일을 생성하고, 내부의 데이터를 수정하고 저장하는 등 csv 관련된 작업을 처리하기 위한 플러그인입니다.
 
 ## Other Language Docs
--[korean](./docs/README.kr.md)
+-[english](../README.md)
 -maybe add later...
 
 ## Brief Notice & Description
