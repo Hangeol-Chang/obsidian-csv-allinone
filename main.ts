@@ -7,6 +7,7 @@ import {
 	TFile,
 } from 'obsidian';
 import { createInflate } from 'zlib';
+import CsvCreateModal from 'src/csvcreator';
 
 interface CsvPluginSettings {
 	mySetting: string;
@@ -31,7 +32,7 @@ export default class CsvPlugin extends Plugin {
 	openCsvInputModal = async (app: App, headers: string[], fileName: string) => {
 		createCsvInputModal_(app, headers, fileName);
 	}
-	createCsvTableView = (csvTable: CSVTable): string => {
+	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
 		return createCsvTableView_(csvTable);
 	}
 		
@@ -43,6 +44,16 @@ export default class CsvPlugin extends Plugin {
 		
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CsvSettingTab(this.app, this));
+
+
+		// commands
+		this.addCommand({
+			id: "create-csv-table",
+			name: "Create CSV Table",
+			callback: () => {
+				new CsvCreateModal(this.app).open();
+			},
+		});
 	}
 	onunload() {}
 
