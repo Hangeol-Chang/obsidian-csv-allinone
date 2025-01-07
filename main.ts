@@ -3,10 +3,8 @@ import { createCsvInputModal_, createCsvTableView_ } from './src/csvdisplay';
 import { CSVTable } from './src/types'
 
 import { 
-	App, Modal, Plugin, PluginSettingTab, Setting,
-	TFile,
+	App, Plugin, PluginSettingTab, Setting,
 } from 'obsidian';
-import { createInflate } from 'zlib';
 import CsvCreateModal from 'src/csvcreator';
 
 interface CsvPluginSettings {

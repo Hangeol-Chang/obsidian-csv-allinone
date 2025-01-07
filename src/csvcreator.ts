@@ -5,6 +5,7 @@ export default class CsvCreateModal extends Modal {
         super(app);
     }
 
+    // common api
     onOpen() {
         let {contentEl} = this;
         contentEl.createEl('h2', {text: 'Create CSV Table'});
