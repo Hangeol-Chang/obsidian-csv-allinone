@@ -29,6 +29,13 @@ export default class CsvCreateModal extends Modal {
 
     }
 
+    createSCVFile() {
+        // .csv 파일 생성
+        
+        // .csv.meta 파일 생성
+        
+    }
+
     // common api
     onOpen() {
         let {contentEl} = this;

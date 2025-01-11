@@ -6,6 +6,7 @@ import {
 	App, Plugin, PluginSettingTab, Setting,
 } from 'obsidian';
 import CsvCreateModal from 'src/csvcreator';
+import CsvExplorerModal, { getCsvFileStructure } from 'src/csvexplorer';
 
 interface CsvPluginSettings {
 	mySetting: string;
@@ -43,7 +44,6 @@ export default class CsvPlugin extends Plugin {
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CsvSettingTab(this.app, this));
 
-
 		// commands
 		this.addCommand({
 			id: "create-csv-table",
@@ -52,6 +52,15 @@ export default class CsvPlugin extends Plugin {
 				new CsvCreateModal(this.app).open();
 			},
 		});
+
+		this.addCommand({
+			id: "open-csv-explorer",
+			name: "Open CSV Explorer",
+			callback: async () => {
+				const csvStructure = await getCsvFileStructure(this.app);
+				new CsvExplorerModal(this.app, csvStructure).open();
+			}
+		})
 	}
 	onunload() {}
 
