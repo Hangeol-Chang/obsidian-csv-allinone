@@ -89,3 +89,9 @@ export interface CSVFile {
     path: string;
     content: CSVTable;
 }
+
+export const columnTypes: string[] = [
+    'string',
+    'number',
+    'boolean',
+];
