@@ -1,6 +1,7 @@
 import { CSVTable } from './types'
 import { App, TFile } from 'obsidian';
 
+// public api
 export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | null> => {
 	if(fileName.endsWith(".csv")) {	// 확장자 검사.
 		const content = await loadFile(app, fileName);	// 파일 로드.

@@ -2,7 +2,41 @@ import { App, Modal, Notice, Plugin } from 'obsidian';
 import './styles/csvcreator.css';
 import { columnTypes } from './types';
 
+// dataviewjs 등으로 자동적으로 파일을 생성하게 할 때 사용할 수 있는 api
+export const createCsvFile_ = (app: App, filename: string, filePath: string, columnData: { name:string, type: string }[]) => {
+    // .csv 내용 생성 (헤더만 추가)
+    const csvContent = columnData.map((col) => col.name).join(',') + '\n';
 
+    // .csv.meta 내용 생성
+    const metaContent = JSON.stringify(
+        columnData.reduce((acc, col) => {
+            acc[col.name] = col.type;
+            return acc;
+        }, {} as Record<string, string>),
+        null,
+        2
+    );
+
+    // 파일 저장
+    const vault = app.vault;
+    const fullPathCsv = `${filePath}/${filename}.csv`;
+    const fullPathMeta = `${filePath}/${filename}.csv.meta`;
+
+    // .csv 파일 저장
+    vault.adapter.write(fullPathCsv, csvContent).then(() => {
+        new Notice(`${fullPathCsv} file has been created.`);
+    }).catch((err) => {
+        new Notice(`Error occurred while creating .csv file: ${err}`);
+    });
+
+    // .csv.meta 파일 저장
+    vault.adapter.write(fullPathMeta, metaContent).then(() => {
+        new Notice(`${fullPathMeta} file has been created.`);
+    }).catch((err) => {
+        new Notice(`.csv.meta 파일 생성 중 오류 발생: ${err}`);
+        new Notice(`Error occurred while creating .csv.meta file: ${err}`);
+    });
+}
 
 export default class CsvCreateModal extends Modal {
 
@@ -29,7 +63,7 @@ export default class CsvCreateModal extends Modal {
         };
     }
 
-    createSCVFile() {
+    createCsvFile() {
         // .csv 파일 생성
         const { contentEl } = this;
 
@@ -42,7 +76,7 @@ export default class CsvCreateModal extends Modal {
     
         // validation
         if (!filename) {
-            new Notice('파일 이름을 입력해주세요.');
+            new Notice('Please enter a file name.');
             return;
         }
         if(filename.endsWith('.csv')) {
@@ -67,41 +101,11 @@ export default class CsvCreateModal extends Modal {
         });
     
         if (columnData.length === 0) {
-            new Notice('적어도 하나의 컬럼을 추가해주세요.');
+            new Notice('add at least one column');
             return;
         }
-    
-        // .csv 내용 생성 (헤더만 추가)
-        const csvContent = columnData.map((col) => col.name).join(',') + '\n';
-    
-        // .csv.meta 내용 생성
-        const metaContent = JSON.stringify(
-            columnData.reduce((acc, col) => {
-                acc[col.name] = col.type;
-                return acc;
-            }, {} as Record<string, string>),
-            null,
-            2
-        );
-    
-        // 파일 저장
-        const vault = this.app.vault;
-        const fullPathCsv = `${filePath}/${filename}.csv`;
-        const fullPathMeta = `${filePath}/${filename}.csv.meta`;
-    
-        // .csv 파일 저장
-        vault.adapter.write(fullPathCsv, csvContent).then(() => {
-            new Notice(`${fullPathCsv} 파일이 생성되었습니다.`);
-        }).catch((err) => {
-            new Notice(`.csv 파일 생성 중 오류 발생: ${err}`);
-        });
-    
-        // .csv.meta 파일 저장
-        vault.adapter.write(fullPathMeta, metaContent).then(() => {
-            new Notice(`${fullPathMeta} 파일이 생성되었습니다.`);
-        }).catch((err) => {
-            new Notice(`.csv.meta 파일 생성 중 오류 발생: ${err}`);
-        });
+        
+        createCsvFile_(this.app, filename, filePath, columnData);
     }
 
     // common api
@@ -144,7 +148,7 @@ export default class CsvCreateModal extends Modal {
         contentEl.createEl('hr');
         let buttonEl = contentEl.createEl('button', {text: 'Create'});
         buttonEl.addEventListener('click', () => { 
-            this.createSCVFile(); 
+            this.createCsvFile(); 
             this.close();
         });
     }

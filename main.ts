@@ -5,7 +5,7 @@ import { CSVTable } from './src/types'
 import { 
 	App, Plugin, PluginSettingTab, Setting,
 } from 'obsidian';
-import CsvCreateModal from 'src/csvcreator';
+import CsvCreateModal, { createCsvFile_ } from 'src/csvcreator';
 import CsvExplorerModal, { getCsvFileStructure } from 'src/csvexplorer';
 
 interface CsvPluginSettings {
@@ -34,7 +34,9 @@ export default class CsvPlugin extends Plugin {
 	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
 		return createCsvTableView_(csvTable);
 	}
-		
+	createCsvFile = (filename: string, filePath: string, columnData: { name:string, type: string }[]) => {
+		createCsvFile_(this.app, filename, filePath, columnData);
+	}
 
 	async onload() {
 		await this.loadSettings();
