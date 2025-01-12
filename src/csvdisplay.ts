@@ -104,7 +104,7 @@ export const createCsvTableView_ = (csvTable: CSVTable): HTMLElement => {
     const headerRow = document.createElement("tr");
     headers.forEach(header => {
         const th = document.createElement("th");
-        th.textContent = header;
+        th.textContent = header[0];
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
