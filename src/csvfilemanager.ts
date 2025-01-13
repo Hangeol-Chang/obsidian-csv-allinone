@@ -16,14 +16,25 @@ export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | n
 		// read .csv.meta file,
 		// meta file 존재 여부 확인해서 없으면 생성.
 		if(await app.vault.adapter.exists(`${fileName}.meta`) == false) {
-			const headers: Header[] = headersString.map((header) => [header, "string"]);
-			const metaContent = JSON.stringify(headers, null, 2);
+			const headers: { name: string, type: string }[] = 
+				headersString.map((header) => ({ name: header, type: "string" }));
+
+			const metaContent = JSON.stringify(
+				headers.reduce((acc, col) => {
+					acc[col.name] = col.type;
+					return acc;
+				}, {} as Record<string, string>),
+				null,
+				2
+			);
+			// const metaContent = JSON.stringify(headers, null, 2);
 			await saveFile(app, `${fileName}.meta`, metaContent);
 		}
+		
 
 		// meta file 로드.
 		const metaData = await loadFile(app, `${fileName}.meta`);	// 메타 파일 로드.
-		const headers: Header[] = JSON.parse(metaData);
+		const headers: Header[] = Object.entries(JSON.parse(metaData));
 
 		return await new CSVTable(headers, rows)	// CSV 파싱.
 	} else {
