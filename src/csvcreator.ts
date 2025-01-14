@@ -3,7 +3,7 @@ import './styles/csvCreator.css';
 import { columnTypes } from './types';
 
 // dataviewjs 등으로 자동적으로 파일을 생성하게 할 때 사용할 수 있는 api
-export const createCsvFile_ = (app: App, filename: string, filePath: string, columnData: { name:string, type: string }[]) => {
+export const createCsvFile_ = (app: App, filename: string, filePath: string, columnData: { name:string, type: string }[]) : boolean => {
     // .csv 내용 생성 (헤더만 추가)
     const csvContent = columnData.map((col) => col.name).join(',') + '\n';
 
@@ -26,16 +26,18 @@ export const createCsvFile_ = (app: App, filename: string, filePath: string, col
     vault.adapter.write(fullPathCsv, csvContent).then(() => {
         new Notice(`${fullPathCsv} file has been created.`);
     }).catch((err) => {
-        new Notice(`Error occurred while creating .csv file: ${err}`);
+        new Notice(`Error occurred while creating .csv file:\n${err}`);
+        return false;
     });
 
     // .csv.meta 파일 저장
     vault.adapter.write(fullPathMeta, metaContent).then(() => {
         new Notice(`${fullPathMeta} file has been created.`);
     }).catch((err) => {
-        new Notice(`.csv.meta 파일 생성 중 오류 발생: ${err}`);
-        new Notice(`Error occurred while creating .csv.meta file: ${err}`);
+        new Notice(`Error occurred while creating .csv.meta file:\n${err}`);
+        return false;
     });
+    return true;
 }
 
 export default class CsvCreateModal extends Modal {
@@ -77,7 +79,7 @@ export default class CsvCreateModal extends Modal {
         // validation
         if (!filename) {
             new Notice('Please enter a file name.');
-            return;
+            return false;
         }
         if(filename.endsWith('.csv')) {
             filename = filename.slice(0, -4);
@@ -102,10 +104,10 @@ export default class CsvCreateModal extends Modal {
     
         if (columnData.length === 0) {
             new Notice('add at least one column');
-            return;
+            return false;
         }
         
-        createCsvFile_(this.app, filename, filePath, columnData);
+        return createCsvFile_(this.app, filename, filePath, columnData);
     }
 
     // common api
@@ -148,8 +150,14 @@ export default class CsvCreateModal extends Modal {
         contentEl.createEl('hr');
         let buttonEl = contentEl.createEl('button', {text: 'Create'});
         buttonEl.addEventListener('click', () => { 
-            this.createCsvFile(); 
-            this.close();
+            event?.preventDefault();
+            const result = this.createCsvFile(); 
+            if(result) {
+                this.close();
+            }
+            else {
+                new Notice('Error occurred while creating .csv file');
+            }
         });
     }
 
