@@ -1,11 +1,11 @@
 {
 	"id": "csv-allinone",
 	"name": "CSV All-in-One",
-	"version": "0.1.1",
+	"version": "0.1.0",
 	"minAppVersion": "1.7.7",
 	"description": "all about csv.",
 	"author": "hihangeol",
 	"authorUrl": "https://github.com/Hangeol-Chang/obsidian-csv-allinone",
-	"fundingUrl": "https://github.com/Hangeol-Chang/obsidian-csv-allinone",
+	"fundingUrl": "https://buymeacoffee.com/hihangeol",
 	"isDesktopOnly": false
 }
