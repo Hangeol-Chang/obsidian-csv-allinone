@@ -1,0 +1,75 @@
+.filename-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filename-input {
+    width: 60%;
+    flex-grow : 2;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+    background-color: var(--background-secondary);
+}
+.filepath-input {
+    width: 30%;
+    flex-grow: 1;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+    background-color: var(--background-secondary);
+}
+
+hr {
+    margin: 5px 0;
+    border: 0;
+    width: 100%;
+    border-top: 1px solid #ccc;
+}
+
+.columns-table {
+    width: 100%;
+}
+
+.columns-wrapper {
+    width: 100%;
+}
+.columns-wrapper > :nth-child(2n) {
+    background-color: var(--background-secondary);
+}
+
+.columns-table-header {
+    gap: 1rem;
+    align-items: center;
+}
+
+.colname-input {
+    padding: 2px;
+    width: 100%; height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+}
+
+.coltype-select {
+    padding: 2px;
+    width: 100%; height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+}
+

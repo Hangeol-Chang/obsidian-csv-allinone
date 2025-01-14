@@ -1,12 +1,12 @@
-import { readCSV_, saveCSV_} from 'src/csvfilemanager';
-import { createCsvInputModal_, createCsvTableView_ } from './src/csvdisplay';
-import { CSVTable } from './src/types'
-
 import { 
-	App, Modal, Plugin, PluginSettingTab, Setting,
-	TFile,
+	App, Plugin, PluginSettingTab, Setting,
 } from 'obsidian';
-import { createInflate } from 'zlib';
+
+import { createCsvInputModal_, createCsvTableView_ } from './src/csvPlugin';
+import { readCSV_, saveCSV_} from 'src/csvFilemanager';
+import { CSVTable, Header } from './src/types'
+import CsvExplorerModal, { getCsvFileStructure } from 'src/csvExplorer';
+import CsvCreateModal, { createCsvFile_ } from 'src/csvCreator';
 
 interface CsvPluginSettings {
 	mySetting: string;
@@ -28,13 +28,15 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	//// csvdisplay.ts
-	openCsvInputModal = async (app: App, headers: string[], fileName: string) => {
+	openCsvInputModal = async (app: App, headers: Header[], fileName: string) => {
 		createCsvInputModal_(app, headers, fileName);
 	}
-	createCsvTableView = (csvTable: CSVTable): string => {
+	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
 		return createCsvTableView_(csvTable);
 	}
-		
+	createCsvFile = (filename: string, filePath: string, columnData: { name:string, type: string }[]) => {
+		createCsvFile_(this.app, filename, filePath, columnData);
+	}
 
 	async onload() {
 		await this.loadSettings();
@@ -43,6 +45,24 @@ export default class CsvPlugin extends Plugin {
 		
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CsvSettingTab(this.app, this));
+
+		// commands
+		this.addCommand({
+			id: "create-csv-table",
+			name: "Create CSV Table",
+			callback: () => {
+				new CsvCreateModal(this.app).open();
+			},
+		});
+
+		this.addCommand({
+			id: "open-csv-explorer",
+			name: "Open CSV Explorer",
+			callback: async () => {
+				const csvStructure = await getCsvFileStructure(this.app);
+				new CsvExplorerModal(this.app, csvStructure).open();
+			}
+		})
 	}
 	onunload() {}
 

@@ -18,6 +18,10 @@
     padding: 1rem;
 }
 
+.input-type {
+    background-color: grey;
+}
+
 .input-key {
     text-align: left;
     margin-right: 0.5rem;

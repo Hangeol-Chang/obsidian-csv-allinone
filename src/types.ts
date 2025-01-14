@@ -1,24 +1,29 @@
 export type CSVCell = string | number | null;
 export type CSVRow = CSVCell[];
+export type Header = [string, string]; // [columnName, columnType]
 export class CSVTable {
-    private headers: string[];
+    private headers: Header[];
     private rows: CSVRow[];
 
     // string으로 넣거나, 분리된 headers/rows로 생성자 호출 가능.
-    constructor(contentOrHeaders: string | string[], rows: CSVRow[] = []) {
-        if (typeof contentOrHeaders === 'string') {
-            // content가 문자열일 때
-            const lines = contentOrHeaders.split("\n").map(line => line.trim());
-            this.headers = lines.shift()?.split(",") ?? [];
-            this.rows = lines.map(line => line.split(",").map(cell => cell.trim()));
-        } else {
-            // headers가 배열일 때
-            this.headers = contentOrHeaders;
-            this.rows = rows;
-        }
+    constructor(headers: Header[], rows: CSVRow[] = []) {
+        this.headers = headers;
+        this.rows = rows;
     }
+    // constructor(contentOrHeaders: string | string[], rows: CSVRow[] = []) {
+    //     if (typeof contentOrHeaders === 'string') {
+    //         // content가 문자열일 때
+    //         const lines = contentOrHeaders.split("\n").map(line => line.trim());
+    //         this.headers = lines.shift()?.split(",") ?? [];
+    //         this.rows = lines.map(line => line.split(",").map(cell => cell.trim()));
+    //     } else {
+    //         // headers가 배열일 때
+    //         this.headers = contentOrHeaders;
+    //         this.rows = rows;
+    //     }
+    // }
 
-    getHeaders(): string[] {
+    getHeaders(): Header[] {
         return this.headers;
     }
     getRows(): CSVRow[] {
@@ -35,8 +40,9 @@ export class CSVTable {
                 this.rows.push(row);
             }
             else {
+                // key-value로 들어올 때
                 const newRow: CSVRow = [];
-                for(const header of this.headers) { newRow.push(row[header]); }
+                for(const header of this.headers) { newRow.push(row[header[0]]); }
                 this.rows.push(newRow);
             }
         }
@@ -48,7 +54,7 @@ export class CSVTable {
         this.rows.splice(rowIndex, 1);
     }
     updateCell(rowIndex: number, columnName: string, value: CSVCell): void {
-        const columnIndex = this.headers.indexOf(columnName);
+        const columnIndex = this.headers.findIndex(([colname]) => colname === columnName);
         if (columnIndex === -1) {   
             throw new Error(`Column '${columnName}' does not exist.`);
         }
@@ -67,14 +73,14 @@ export class CSVTable {
     }
 
     // 실제로 사용하게될 api일지는 모르겠습니다.
-    addColoumn(columnName: string, value: CSVCell = 0): void {
-        this.headers.push(columnName);
+    addColoumn(columnName: string, columnType: string, value: CSVCell = 0): void {
+        this.headers.push([columnName, columnType]);
         for (let i = 0; i < this.rows.length; i++) {
             this.rows[i].push(value);
         }
     }
     deleteColumn(columnName: string): void {
-        const columnIndex = this.headers.indexOf(columnName);
+        const columnIndex = this.headers.findIndex(([colname]) => colname === columnName);
         if (columnIndex === -1) {
             throw new Error(`Column '${columnName}' does not exist.`);
         }
@@ -89,3 +95,9 @@ export interface CSVFile {
     path: string;
     content: CSVTable;
 }
+
+export const columnTypes: string[] = [
+    'string',
+    'number',
+    'boolean',
+];
