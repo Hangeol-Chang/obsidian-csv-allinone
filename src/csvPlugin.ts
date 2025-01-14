@@ -1,10 +1,10 @@
 import { App, Modal } from "obsidian";
-import { CSVRow, CSVTable } from "./types";
+import { CSVRow, CSVTable, Header } from "./types";
 import { readCSV_, saveCSV_ } from "./csvFilemanager";
-import './styles/csvDisplay.css';
+import './styles/csvPlugin.css';
 
-export const createCsvInputModal_ = async (app: App, headers: string[], fileName: string) => {
-    const form = generateForm(headers);
+export const createCsvInputModal_ = async (app: App, headers: Header[], fileName: string) => {
+    const form = generateForm(fileName, headers);
     
     const modal = new Modal(app);
     modal.contentEl.empty();
@@ -20,7 +20,7 @@ export const createCsvInputModal_ = async (app: App, headers: string[], fileName
         
         const newRow: CSVRow = [];
         for(const header of headers) {
-            newRow.push(formData.get(header) as string);
+            newRow.push(formData.get(header[0]) as string);
         }
 
         // 파일 읽기
@@ -37,14 +37,28 @@ export const createCsvInputModal_ = async (app: App, headers: string[], fileName
     });
 }
 
-const generateForm = (headers: string[]): HTMLFormElement => {
-    // 폼 요소 생성
+const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
     const form = document.createElement("form");
     form.id = "csv-input-form";
 
+    const fileNameArray = fileName.split('/');
+    const fileNameShort = fileNameArray[fileNameArray.length - 1];
+
+    const titleTinkle = document.createElement("h6");
+    titleTinkle.textContent = "Add new row to";
+    const title = document.createElement("h2");
+    title.textContent = fileNameShort;
+
+    form.appendChild(titleTinkle);
+    form.appendChild(title);
+
+    // 수평선 삽입.
+    form.appendChild(document.createElement("hr"));
+
+    // 폼 요소 생성
     // 입력 필드 생성 및 추가
     headers.forEach(header => {
-        const field = createInputField(header);
+        const field = createHeaderInputField(header);
         form.appendChild(field);
     });
 
@@ -61,6 +75,32 @@ const generateForm = (headers: string[]): HTMLFormElement => {
     form.appendChild(buttonGroup);
 
     return form;
+}
+
+const createHeaderInputField = (key: [string, string]): HTMLDivElement => {
+    // 입력 필드 래퍼 생성
+    const formGroup = document.createElement("div");
+    formGroup.className = "form-group";
+
+    // 라벨 생성
+    const label = document.createElement("label");
+    label.className = "input-key";
+    label.htmlFor = key[0];
+    label.textContent = key[0];
+
+    // 입력 필드 생성
+    const input = document.createElement("input");
+    input.className = "input-value";
+    input.type = "text";
+    input.id = key[0];
+    input.name = key[0];
+    input.placeholder = key[1];
+
+    // 요소 추가
+    formGroup.appendChild(label);
+    formGroup.appendChild(input);
+
+    return formGroup;
 }
 
 const createInputField = (key: string): HTMLDivElement => {

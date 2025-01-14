@@ -4,7 +4,7 @@ import {
 
 import { createCsvInputModal_, createCsvTableView_ } from './src/csvPlugin';
 import { readCSV_, saveCSV_} from 'src/csvFilemanager';
-import { CSVTable } from './src/types'
+import { CSVTable, Header } from './src/types'
 import CsvExplorerModal, { getCsvFileStructure } from 'src/csvExplorer';
 import CsvCreateModal, { createCsvFile_ } from 'src/csvCreator';
 
@@ -28,7 +28,7 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	//// csvdisplay.ts
-	openCsvInputModal = async (app: App, headers: string[], fileName: string) => {
+	openCsvInputModal = async (app: App, headers: Header[], fileName: string) => {
 		createCsvInputModal_(app, headers, fileName);
 	}
 	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
