@@ -1,12 +1,12 @@
-import { readCSV_, saveCSV_} from 'src/csvfilemanager';
-import { createCsvInputModal_, createCsvTableView_ } from './src/csvdisplay';
-import { CSVTable } from './src/types'
-
 import { 
 	App, Plugin, PluginSettingTab, Setting,
 } from 'obsidian';
-import CsvCreateModal, { createCsvFile_ } from 'src/csvcreator';
-import CsvExplorerModal, { getCsvFileStructure } from 'src/csvexplorer';
+
+import { createCsvInputModal_, createCsvTableView_ } from './src/csvPlugin';
+import { readCSV_, saveCSV_} from 'src/csvFilemanager';
+import { CSVTable } from './src/types'
+import CsvExplorerModal, { getCsvFileStructure } from 'src/csvExplorer';
+import CsvCreateModal, { createCsvFile_ } from 'src/csvCreator';
 
 interface CsvPluginSettings {
 	mySetting: string;

@@ -1,5 +1,5 @@
 import { App, Modal, Notice, Plugin } from 'obsidian';
-import './styles/csvcreator.css';
+import './styles/csvCreator.css';
 import { columnTypes } from './types';
 
 // dataviewjs 등으로 자동적으로 파일을 생성하게 할 때 사용할 수 있는 api

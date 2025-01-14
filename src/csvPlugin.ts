@@ -1,7 +1,7 @@
 import { App, Modal } from "obsidian";
 import { CSVRow, CSVTable } from "./types";
-import { readCSV_, saveCSV_ } from "./csvfilemanager";
-import './styles/csvdisplay.css';
+import { readCSV_, saveCSV_ } from "./csvFilemanager";
+import './styles/csvDisplay.css';
 
 export const createCsvInputModal_ = async (app: App, headers: string[], fileName: string) => {
     const form = generateForm(headers);
