@@ -24,8 +24,7 @@
 - Ctrl + P -> 'Open CSV Explorer' 검색
 - csv 파일의 위치 이동, 삭제가 가능.
 
--- 사진 추가 예정 --
-
+![csv_explorer](./images/csv_explorer.png)
 
 ### with dataviewjs
 
@@ -71,7 +70,7 @@ csvPlugin.readCSV(app, fileName).then(res => {
 })
 ```
 - 결과물
--- 추가 예정 --
+![add_row_to_table](./images/add_row_to_table.gif)
 
 #### - add new column
 #### - delete exist column
@@ -91,10 +90,12 @@ csvPlugin.readCSV(app, fileName).then(res => {
 	- return Promise<CSVTable | null>
 	> filename을 입력받아서 CSVTable을 반환해줍니다.
 
-
 - saveCSV
+	- parameters (app: App, fileName, string, table: SCVTable)
+	- return void
+	> csvtable 정보를 받아서 저장합니다.
 
-### CSVTable (class)1
+### CSVTable (class)
 -- class에서 할 수 있는 함수들 작성해둘 것.
 
 
