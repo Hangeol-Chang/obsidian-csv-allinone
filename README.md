@@ -18,14 +18,14 @@ A plugin for handling `.csv` files, including creating, editing, and saving CSV 
 
 - Press `Ctrl + P` -> Search for 'Create CSV Table'
 Enter the required data as shown below and click Submit.
-![create_csv_table](./images/create_csv_table.gif)
+![create_csv_table](./docs/images/create_csv_table.gif)
 
 #### Search CSV Files
 - UI is subject to updates.
 - Press `Ctrl + P` -> Search for 'Open CSV Explorer'
 - Move or delete CSV files.
 
-![csv_explorer](./images/csv_explorer.png)
+![csv_explorer](./docs/images/csv_explorer.png)
 
 ### Using dataviewjs
 
@@ -41,7 +41,7 @@ csvPlugin.readCSV(app, fileName).then(res => {
 })
 ```
 - Output
-![view_csv_table](./images/view_csv_table.png)
+![view_csv_table](./docs/images/view_csv_table.png)
 
 #### - Add New Data (Row)
 > Requires the `buttons` plugin.
@@ -70,7 +70,7 @@ csvPlugin.readCSV(app, fileName).then(res => {
 })
 ```
 - Output
-![add_row_to_table](./images/add_row_to_table.gif)
+![add_row_to_table](./docs/images/add_row_to_table.gif)
 
 #### - Add New Column
 #### - Delete Existing Column
