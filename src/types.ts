@@ -10,9 +10,28 @@ export type CSVRow = CSVCell[];
 
 export type Header = {
     [key: string]: {
-        type: string;
+        type: "string" | "number" | "stringDate" | "select" /*string*/;
         default: CSVCell;
         options?: string[];  // select type일 때만 필요
+    }
+}
+export function Header(metaData: string): Header {
+    const parsedData = JSON.parse(metaData) as Header;  // 타입을 명시적으로 지정
+    try {
+        const headers: Header = Object.entries(parsedData).reduce((acc, [name, config]) => {
+            acc[name] = {
+                type: config.type as "string" | "number" | "stringDate" | "select",  // type이 정확히 무엇인지 명시
+                default: config.default,
+                ...(config.options && { options: config.options })  // select일 때만 options 포함
+            };
+            return acc;
+        }, {} as Header);
+
+        return headers;
+    }
+    catch (e) {
+        throw new Error("Invalid meta data.");
+        return {};
     }
 }
 

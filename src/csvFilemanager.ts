@@ -34,7 +34,7 @@ export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | n
 
 		// meta file 로드.
 		const metaData = await loadFile(app, `${fileName}.meta`);	// 메타 파일 로드.
-		const headers: Header[] = Object.entries(JSON.parse(metaData));
+		const headers: Header = Header(metaData);					// 메타 파일 파싱.
 
 		return await new CSVTable(headers, rows)	// CSV 파싱.
 	} else {
