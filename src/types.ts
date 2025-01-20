@@ -5,12 +5,13 @@ function isStringDate(date: string): date is stringDate {
 }
 export type select = string;
 
-export type CSVCell = string | number | stringDate | select | Date /*사용 여부 미정*/ | null;
+export type CSVCell = string | number | stringDate | select | null;
+export type CSVCellType = "string" | "number" | "stringDate" | "select" | "null";
 export type CSVRow = CSVCell[];
 
 export type Header = {
     [key: string]: {
-        type: "string" | "number" | "stringDate" | "select" /*string*/;
+        type: CSVCellType;
         default: CSVCell;
         options?: string[];  // select type일 때만 필요
     }
@@ -102,7 +103,7 @@ export class CSVTable {
         return csvContent.join("\n");
     }
 
-    addColumn(columnName: string, columnType: string, value: CSVCell = 0): void {
+    addColumn(columnName: string, columnType: CSVCellType, value: CSVCell = 0): void {
         this.headers[columnName] = { type: columnType, default: value };
         for (let i = 0; i < this.rows.length; i++) {
             this.rows[i].push(value);
