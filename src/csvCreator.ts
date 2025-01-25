@@ -1,9 +1,10 @@
 import { App, Modal, Notice, Plugin } from 'obsidian';
 import './styles/csvCreator.css';
-import { columnTypes } from './types';
+import { CSVCellType, CSVCellTypeString, Header } from './types';
 
 // dataviewjs 등으로 자동적으로 파일을 생성하게 할 때 사용할 수 있는 api
-export const createCsvFile_ = (app: App, filename: string, filePath: string, columnData: { name:string, type: string }[]) : boolean => {
+export const createCsvFile_ = (app: App, filename: string, columnData: Header) : boolean => {
+    // 수정해야함.
     // .csv 내용 생성 (헤더만 추가)
     const csvContent = columnData.map((col) => col.name).join(',') + '\n';
 
@@ -19,20 +20,18 @@ export const createCsvFile_ = (app: App, filename: string, filePath: string, col
 
     // 파일 저장
     const vault = app.vault;
-    const fullPathCsv = `${filePath}/${filename}.csv`;
-    const fullPathMeta = `${filePath}/${filename}.csv.meta`;
 
     // .csv 파일 저장
-    vault.adapter.write(fullPathCsv, csvContent).then(() => {
-        new Notice(`${fullPathCsv} file has been created.`);
+    vault.adapter.write(`${filename}.csv`, csvContent).then(() => {
+        new Notice(`${filename}.csv file has been created.`);
     }).catch((err) => {
         new Notice(`Error occurred while creating .csv file:\n${err}`);
         return false;
     });
 
     // .csv.meta 파일 저장
-    vault.adapter.write(fullPathMeta, metaContent).then(() => {
-        new Notice(`${fullPathMeta} file has been created.`);
+    vault.adapter.write(`${filename}.csv.meta`, metaContent).then(() => {
+        new Notice(`${filename}.csv.meta file has been created.`);
     }).catch((err) => {
         new Notice(`Error occurred while creating .csv.meta file:\n${err}`);
         return false;
@@ -44,25 +43,40 @@ export default class CsvCreateModal extends Modal {
 
     columnsWrapper: HTMLElement;
 
-    constructor(app: App) {
-        super(app);
-    }
+    constructor(app: App) { super(app); }
 
+    // column 추가
     addColumn() {
         let inputWarpper = this.columnsWrapper.createEl('tr');
         let columnTd = inputWarpper.createEl('td');
         let columnInput = columnTd.createEl('input');
         columnInput.classList.add('colname-input');
+        columnInput.id = 'colname';
         columnInput.placeholder = 'name';
 
         let typeTd = inputWarpper.createEl('td');
         let typeSelect = typeTd.createEl('select');
         typeSelect.classList.add('coltype-select');
-        for (let type of columnTypes) {
+        typeSelect.id = 'coltype';
+        for (let type of CSVCellTypeString) {
             let option = typeSelect.createEl('option');
             option.value = type;
             option.text = type;
         };
+
+        let defaultTd = inputWarpper.createEl('td');
+        let defaultInput = defaultTd.createEl('input');
+        defaultInput.classList.add('coldefault');
+        defaultInput.id = 'coldefault';
+        defaultInput.placeholder = 'default value';
+
+        // select type일 때만 options 추가
+        let optionsTd = inputWarpper.createEl('td');
+        let optionsInput = optionsTd.createEl('input');
+        optionsInput.classList.add('coloptions-wrapper');
+        optionsInput.id = 'coloptions';
+        optionsInput.placeholder = 'options (separated by comma)';
+        // type가 select일 때만 css로 쿼리해서 보이게 할 것.
     }
 
     createCsvFile() {
@@ -87,6 +101,47 @@ export default class CsvCreateModal extends Modal {
         if(filePath.length > 1 && filePath.endsWith('/')) {
             filePath = filePath.slice(0, -1);
         }
+
+        const columnData: Header = {};
+        this.columnsWrapper.querySelectorAll('tr').forEach((columnEl) => {
+            const inputEl = columnEl.querySelector('#colname') as HTMLInputElement;
+            const selectEl = columnEl.querySelector('#coltype') as HTMLSelectElement;
+            const defaultEl = columnEl.querySelector('#coldefault') as HTMLInputElement;
+            const optionsEl = columnEl.querySelector('#coloptions') as HTMLInputElement;
+    
+            const columnName = inputEl?.value.trim();
+            const columnType = selectEl?.value;
+            let columnDefault : string | number = defaultEl?.value.trim();
+    
+            if(columnDefault == '') {
+                switch(columnType) {
+                case 'number':
+                    columnDefault = 0;
+                    break;
+                case 'stringDate':
+                    columnDefault = '1970-01-01';
+                    break;
+
+                case 'string':
+                case 'select':
+                case 'null':
+                default:
+                    columnDefault = '';
+                    break;
+                }
+            }
+
+            if (columnName && columnType) {
+                columnData[columnName] = { 
+                    type: columnType as any, 
+                    default: columnDefault,
+                    options: 
+                        columnType === 'select' 
+                        ? optionsEl.value.split(',').map((option) => option.trim()) 
+                        : undefined
+                };
+            }
+        });
 
         // 컬럼 정보 수집
         const columnData: { name: string; type: string }[] = [];

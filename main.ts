@@ -34,8 +34,8 @@ export default class CsvPlugin extends Plugin {
 	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
 		return createCsvTableView_(csvTable);
 	}
-	createCsvFile = (filename: string, filePath: string, columnData: { name:string, type: string }[]) => {
-		createCsvFile_(this.app, filename, filePath, columnData);
+	createCsvFile = (filename: string, columnData: Header) => {
+		createCsvFile_(this.app, filename, columnData);
 	}
 
 	async onload() {

@@ -6,7 +6,8 @@ function isStringDate(date: string): date is stringDate {
 export type select = string;
 
 export type CSVCell = string | number | stringDate | select | null;
-export type CSVCellType = "string" | "number" | "stringDate" | "select" | "null";
+export const CSVCellTypeString = ["string", "number", "stringDate", "select", "null"] as const;
+export type CSVCellType = (typeof CSVCellTypeString)[number]; // 문자열 리터럴 타입 생성
 export type CSVRow = CSVCell[];
 
 export type Header = {
@@ -21,7 +22,7 @@ export function Header(metaData: string): Header {
     try {
         const headers: Header = Object.entries(parsedData).reduce((acc, [name, config]) => {
             acc[name] = {
-                type: config.type as "string" | "number" | "stringDate" | "select",  // type이 정확히 무엇인지 명시
+                type: config.type as CSVCellType, // type이 정확히 무엇인지 명시
                 default: config.default,
                 ...(config.options && { options: config.options })  // select일 때만 options 포함
             };
@@ -34,6 +35,32 @@ export function Header(metaData: string): Header {
         throw new Error("Invalid meta data.");
         return {};
     }
+}
+export function isHeaderSame(header1: Header, header2: Header): boolean {
+    if (Object.keys(header1).length !== Object.keys(header2).length) {
+        return false;
+    }
+    for (const key in header1) {
+        if (!header2[key] || header1[key].type !== header2[key].type) {
+            return false;
+        }
+        if (header1[key].type === "select") {
+            if (header1[key].options?.length !== header2[key].options?.length) {
+                return false;
+            }
+            if(!header1[key].options || !header2[key].options) {
+                return false;
+            }
+            for (let i = 0; i < header1[key].options.length; i++) {
+                if (header1[key].options[i] !== header2[key].options[i]) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    // 두 
+    return true;
 }
 
 export class CSVTable {
