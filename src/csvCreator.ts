@@ -85,7 +85,7 @@ export default class CsvCreateModal extends Modal {
         const filePathInput = contentEl.querySelector('.filepath-input') as HTMLInputElement;
     
         let filename = filenameInput.value.trim();
-        let filePath = filePathInput.value.trim() || '/';
+        let filePath = filePathInput.value.trim() || '';
     
         // validation
         if (!filename) {
