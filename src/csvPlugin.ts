@@ -1,9 +1,9 @@
 import { App, Modal } from "obsidian";
-import { CSVRow, CSVTable, Header } from "./types";
+import { CSVCellType, CSVRow, CSVTable, Header, HeaderContent } from "./types";
 import { readCSV_, saveCSV_ } from "./csvFilemanager";
 import './styles/csvPlugin.css';
 
-export const createCsvInputModal_ = async (app: App, headers: Header[], fileName: string) => {
+export const createCsvInputModal_ = async (app: App, headers: Header, fileName: string) => {
     const form = generateForm(fileName, headers);
     
     const modal = new Modal(app);
@@ -19,10 +19,10 @@ export const createCsvInputModal_ = async (app: App, headers: Header[], fileName
         const formData = new FormData(formElement);
         
         const newRow: CSVRow = [];
-        for(const header of headers) {
-            newRow.push(formData.get(header[0]) as string);
+        for(const key of Object.keys(headers)) {
+            newRow.push(formData.get(key) as CSVCellType);
         }
-
+        
         // 파일 읽기
         const table = await readCSV_(app, fileName);
         if(table === null) {
@@ -37,7 +37,7 @@ export const createCsvInputModal_ = async (app: App, headers: Header[], fileName
     });
 }
 
-const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
+const generateForm = (fileName: string, headers: Header): HTMLFormElement => {
     const form = document.createElement("form");
     form.id = "csv-input-form";
 
@@ -57,10 +57,10 @@ const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
 
     // 폼 요소 생성
     // 입력 필드 생성 및 추가
-    headers.forEach(header => {
-        const field = createHeaderInputField(header);
+    for(const [key, value] of Object.entries(headers)) {
+        const field = createHeaderInputField(key, value);
         form.appendChild(field);
-    });
+    };
 
     // 버튼 그룹 생성 및 추가
     const buttonGroup = document.createElement("div");
@@ -77,7 +77,7 @@ const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
     return form;
 }
 
-const createHeaderInputField = (key: [string, string]): HTMLDivElement => {
+const createHeaderInputField = (key: string, headerContent: HeaderContent): HTMLDivElement => {
     // 입력 필드 래퍼 생성
     const formGroup = document.createElement("div");
     formGroup.className = "form-group";
@@ -85,16 +85,35 @@ const createHeaderInputField = (key: [string, string]): HTMLDivElement => {
     // 라벨 생성
     const label = document.createElement("label");
     label.className = "input-key";
-    label.htmlFor = key[0];
-    label.textContent = key[0];
+    label.htmlFor = key;
+    label.textContent = key;
 
     // 입력 필드 생성
+    // select일 때와 아닐 때로 나눠야 함.
     const input = document.createElement("input");
-    input.className = "input-value";
-    input.type = "text";
-    input.id = key[0];
-    input.name = key[0];
-    input.placeholder = key[1];
+
+    if(headerContent.type === "select") {
+        input.className = "input-value";
+        input.type = "select";
+        input.id = key;
+        input.name = key;
+        input.placeholder = headerContent.default.toString();
+        if(!(headerContent.options === undefined)) {
+            for(const option of headerContent.options) {
+                const optionElement = document.createElement("option");
+                optionElement.value = option;
+                optionElement.textContent = option;
+                input.appendChild(optionElement);
+            }
+        }
+    }
+    else {
+        input.className = "input-value";
+        input.type = "text";
+        input.id = key;
+        input.name = key;
+        input.placeholder = headerContent.default.toString();
+    }
 
     // 요소 추가
     formGroup.appendChild(label);
@@ -142,11 +161,11 @@ export const createCsvTableView_ = (csvTable: CSVTable): HTMLElement => {
     // 테이블 헤더 생성
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
-    headers.forEach(header => {
+    for(const key of Object.keys(headers)) {
         const th = document.createElement("th");
-        th.textContent = header[0];
+        th.textContent = key;
         headerRow.appendChild(th);
-    });
+    }
     thead.appendChild(headerRow);
     table.appendChild(thead);
 

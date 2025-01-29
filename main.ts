@@ -28,7 +28,7 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	//// csvdisplay.ts
-	openCsvInputModal = async (app: App, headers: Header[], fileName: string) => {
+	openCsvInputModal = async (app: App, headers: Header, fileName: string) => {
 		createCsvInputModal_(app, headers, fileName);
 	}
 	createCsvTableView = (csvTable: CSVTable): HTMLElement => {

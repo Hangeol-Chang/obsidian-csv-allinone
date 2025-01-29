@@ -6,17 +6,14 @@ import { CSVCellType, CSVCellTypeString, Header } from './types';
 export const createCsvFile_ = (app: App, filename: string, columnData: Header) : boolean => {
     // 수정해야함.
     // .csv 내용 생성 (헤더만 추가)
-    const csvContent = columnData.map((col) => col.name).join(',') + '\n';
+    let csvContent = '';
+    for(const key of Object.keys(columnData)) {
+        csvContent += key + ',';
+    }
+    csvContent = csvContent.slice(0, -1) + '\n';
 
     // .csv.meta 내용 생성
-    const metaContent = JSON.stringify(
-        columnData.reduce((acc, col) => {
-            acc[col.name] = col.type;
-            return acc;
-        }, {} as Record<string, string>),
-        null,
-        2
-    );
+    const metaContent = JSON.stringify(columnData);
 
     // 파일 저장
     const vault = app.vault;
@@ -101,6 +98,7 @@ export default class CsvCreateModal extends Modal {
         if(filePath.length > 1 && filePath.endsWith('/')) {
             filePath = filePath.slice(0, -1);
         }
+        let fullFilePath = `${filePath}/${filename}`;
 
         const columnData: Header = {};
         this.columnsWrapper.querySelectorAll('tr').forEach((columnEl) => {
@@ -143,26 +141,11 @@ export default class CsvCreateModal extends Modal {
             }
         });
 
-        // 컬럼 정보 수집
-        const columnData: { name: string; type: string }[] = [];
-        this.columnsWrapper.querySelectorAll('tr').forEach((columnEl) => {
-            const inputEl = columnEl.querySelector('input') as HTMLInputElement;
-            const selectEl = columnEl.querySelector('select') as HTMLSelectElement;
-    
-            const columnName = inputEl?.value.trim();
-            const columnType = selectEl?.value;
-    
-            if (columnName && columnType) {
-                columnData.push({ name: columnName, type: columnType });
-            }
-        });
-    
-        if (columnData.length === 0) {
+        if(Object.keys(columnData).length === 0) {
             new Notice('add at least one column');
             return false;
         }
-        
-        return createCsvFile_(this.app, filename, filePath, columnData);
+        return createCsvFile_(this.app, fullFilePath, columnData);
     }
 
     // common api

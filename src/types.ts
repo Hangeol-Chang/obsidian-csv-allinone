@@ -5,18 +5,20 @@ function isStringDate(date: string): date is stringDate {
 }
 export type select = string;
 
-export type CSVCell = string | number | stringDate | select | null;
-export const CSVCellTypeString = ["string", "number", "stringDate", "select", "null"] as const;
+export type CSVCell = string | number | stringDate | select;
+export const CSVCellTypeString = ["string", "number", "stringDate", "select"] as const;
 export type CSVCellType = (typeof CSVCellTypeString)[number]; // 문자열 리터럴 타입 생성
 export type CSVRow = CSVCell[];
 
+export type HeaderContent = {
+    type: CSVCellType;
+    default: CSVCell;
+    options?: string[]; // select type일 때만 필요
+};
 export type Header = {
-    [key: string]: {
-        type: CSVCellType;
-        default: CSVCell;
-        options?: string[];  // select type일 때만 필요
-    }
+    [key: string]: HeaderContent;
 }
+
 export function Header(metaData: string): Header {
     const parsedData = JSON.parse(metaData) as Header;  // 타입을 명시적으로 지정
     try {
@@ -41,20 +43,19 @@ export function isHeaderSame(header1: Header, header2: Header): boolean {
         return false;
     }
     for (const key in header1) {
-        if (!header2[key] || header1[key].type !== header2[key].type) {
+        if (!header1.hasOwnProperty(key)) continue; // ✅ 상속된 속성 방지
+    
+        // header2에 key가 없거나, type이 다르면 false
+        if (!header2[key]?.type || header1[key].type !== header2[key].type) {
             return false;
         }
+    
+        // select type일 때, options 비교
         if (header1[key].type === "select") {
-            if (header1[key].options?.length !== header2[key].options?.length) {
+            const opt1 = [...(header1[key].options ?? [])].sort();
+            const opt2 = [...(header2[key].options ?? [])].sort();
+            if (opt1.length !== opt2.length || !opt1.every((v, i) => v === opt2[i])) {
                 return false;
-            }
-            if(!header1[key].options || !header2[key].options) {
-                return false;
-            }
-            for (let i = 0; i < header1[key].options.length; i++) {
-                if (header1[key].options[i] !== header2[key].options[i]) {
-                    return false;
-                }
             }
         }
     }
