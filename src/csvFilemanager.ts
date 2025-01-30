@@ -24,7 +24,7 @@ export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | n
 						default: "" 
 					};
 					return meta;
-				}, {} as Header))
+				}, {} as Header), null, 2)
 			);
 
 			await saveFile(app, `${fileName}.meta`, metaContent);
@@ -75,9 +75,7 @@ const saveMetaFile = async (app: App, fileName: string, header1: Header): Promis
 	const header2: Header = Header(metaData);		// 메타 파일 파싱.
 
 	if(!isHeaderSame(header1, header2)) {
-		const metaContent: string = (
-			JSON.stringify(header1)
-		);
+		const metaContent: string = JSON.stringify(header1, null, 2);
 		await saveFile(app, fileName, metaContent);
 	}
 }

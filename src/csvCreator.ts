@@ -13,7 +13,7 @@ export const createCsvFile_ = (app: App, filename: string, columnData: Header) :
     csvContent = csvContent.slice(0, -1) + '\n';
 
     // .csv.meta 내용 생성
-    const metaContent = JSON.stringify(columnData);
+    const metaContent = JSON.stringify(columnData, null, 2);
 
     // 파일 저장
     const vault = app.vault;
@@ -45,6 +45,7 @@ export default class CsvCreateModal extends Modal {
     // column 추가
     addColumn() {
         let inputWarpper = this.columnsWrapper.createEl('tr');
+
         let columnTd = inputWarpper.createEl('td');
         let columnInput = columnTd.createEl('input');
         columnInput.classList.add('colname-input');
@@ -63,17 +64,28 @@ export default class CsvCreateModal extends Modal {
 
         let defaultTd = inputWarpper.createEl('td');
         let defaultInput = defaultTd.createEl('input');
-        defaultInput.classList.add('coldefault');
+        defaultInput.classList.add('coldefault-input');
         defaultInput.id = 'coldefault';
         defaultInput.placeholder = 'default value';
 
         // select type일 때만 options 추가
-        let optionsTd = inputWarpper.createEl('td');
-        let optionsInput = optionsTd.createEl('input');
-        optionsInput.classList.add('coloptions-wrapper');
+        let optionsInput = defaultTd.createEl('input');
+        optionsInput.classList.add('coloptions-input');
+        optionsInput.style.display = 'none';
         optionsInput.id = 'coloptions';
         optionsInput.placeholder = 'options (separated by comma)';
         // type가 select일 때만 css로 쿼리해서 보이게 할 것.
+
+        typeTd.addEventListener('change', () => {
+            if(typeSelect.value === 'select') {
+                optionsInput.style.display = 'block';
+                defaultInput.style.display = 'none';
+            }
+            else {
+                optionsInput.style.display = 'none';
+                defaultInput.style.display = 'block';
+            }
+        });
     }
 
     createCsvFile() {
@@ -173,14 +185,23 @@ export default class CsvCreateModal extends Modal {
         // column making table
         let columnsTable = contentEl.createEl('table');
         columnsTable.classList.add('columns-table');
+
+        let colgroup = columnsTable.createEl('colgroup');
+        let nameCol = colgroup.createEl('col');
+        nameCol.style.width = '25%';
+        let typeCol = colgroup.createEl('col');
+        typeCol.style.width = '25%';
+        let defaultCol = colgroup.createEl('col');
+        defaultCol.style.width = '50%';
+
         let tHead = columnsTable.createEl('thead');
         let tHeadRow = tHead.createEl('tr');
         tHeadRow.classList.add('columns-table-header');
 
         tHeadRow.createEl('th', {text: 'Column Name'});
         tHeadRow.createEl('th', {text: 'Type'});
+        tHeadRow.createEl('th', {text: 'Default Value'});
             
-        columnsTable.createEl('hr');
         this.columnsWrapper = columnsTable.createEl('tbody');
         this.columnsWrapper.classList.add('columns-wrapper');
 

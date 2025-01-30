@@ -3,8 +3,8 @@ import { CSVCellType, CSVRow, CSVTable, Header, HeaderContent } from "./types";
 import { readCSV_, saveCSV_ } from "./csvFilemanager";
 import './styles/csvPlugin.css';
 
-export const createCsvInputModal_ = async (app: App, headers: Header, fileName: string) => {
-    const form = generateForm(fileName, headers);
+export const createCsvInputModal_ = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string]: string}) => {
+    const form = generateForm(fileName, headers, defaultValues);
     
     const modal = new Modal(app);
     modal.contentEl.empty();
@@ -37,7 +37,7 @@ export const createCsvInputModal_ = async (app: App, headers: Header, fileName: 
     });
 }
 
-const generateForm = (fileName: string, headers: Header): HTMLFormElement => {
+const generateForm = (fileName: string, headers: Header, defaultValues: {[key: string]: string}): HTMLFormElement => {
     const form = document.createElement("form");
     form.id = "csv-input-form";
 
@@ -58,7 +58,7 @@ const generateForm = (fileName: string, headers: Header): HTMLFormElement => {
     // 폼 요소 생성
     // 입력 필드 생성 및 추가
     for(const [key, value] of Object.entries(headers)) {
-        const field = createHeaderInputField(key, value);
+        const field = createHeaderInputField(key, value, defaultValues[key] || "");
         form.appendChild(field);
     };
 
@@ -77,7 +77,7 @@ const generateForm = (fileName: string, headers: Header): HTMLFormElement => {
     return form;
 }
 
-const createHeaderInputField = (key: string, headerContent: HeaderContent): HTMLDivElement => {
+const createHeaderInputField = (key: string, headerContent: HeaderContent, defaultValue: string): HTMLDivElement => {
     // 입력 필드 래퍼 생성
     const formGroup = document.createElement("div");
     formGroup.className = "form-group";
@@ -88,17 +88,21 @@ const createHeaderInputField = (key: string, headerContent: HeaderContent): HTML
     label.htmlFor = key;
     label.textContent = key;
 
+    formGroup.appendChild(label);
+
     // 입력 필드 생성
     // select일 때와 아닐 때로 나눠야 함.
-    const input = document.createElement("input");
 
+
+    
     if(headerContent.type === "select") {
+        const input = document.createElement("select");
         input.className = "input-value";
-        input.type = "select";
         input.id = key;
         input.name = key;
-        input.placeholder = headerContent.default.toString();
+
         if(!(headerContent.options === undefined)) {
+            // console.log(headerContent.options);
             for(const option of headerContent.options) {
                 const optionElement = document.createElement("option");
                 optionElement.value = option;
@@ -106,18 +110,23 @@ const createHeaderInputField = (key: string, headerContent: HeaderContent): HTML
                 input.appendChild(optionElement);
             }
         }
+        input.value = defaultValue;
+        
+        formGroup.appendChild(input);
     }
     else {
+        const input = document.createElement("input");
         input.className = "input-value";
         input.type = "text";
         input.id = key;
         input.name = key;
         input.placeholder = headerContent.default.toString();
+        input.value = defaultValue;
+
+        formGroup.appendChild(input);
     }
 
     // 요소 추가
-    formGroup.appendChild(label);
-    formGroup.appendChild(input);
 
     return formGroup;
 }

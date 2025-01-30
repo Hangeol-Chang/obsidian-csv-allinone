@@ -28,8 +28,8 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	//// csvdisplay.ts
-	openCsvInputModal = async (app: App, headers: Header, fileName: string) => {
-		createCsvInputModal_(app, headers, fileName);
+	openCsvInputModal = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string] : string} = {} ) => {
+		createCsvInputModal_(app, headers, fileName, defaultValues);
 	}
 	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
 		return createCsvTableView_(csvTable);
