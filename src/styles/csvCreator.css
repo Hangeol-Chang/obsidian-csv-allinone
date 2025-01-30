@@ -51,6 +51,7 @@ hr {
 .columns-table-header {
     gap: 1rem;
     align-items: center;
+    border-bottom: 1px solid #777;
 }
 
 .colname-input {
@@ -73,3 +74,22 @@ hr {
     color: var(--text-normal);
 }
 
+.coldefault-input {
+    padding: 2px;
+    width: 100%; height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+}
+
+.coloptions-input {
+    padding: 2px;
+    width: 100%; height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+}

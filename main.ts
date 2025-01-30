@@ -28,14 +28,14 @@ export default class CsvPlugin extends Plugin {
 	}
 
 	//// csvdisplay.ts
-	openCsvInputModal = async (app: App, headers: Header[], fileName: string) => {
-		createCsvInputModal_(app, headers, fileName);
+	openCsvInputModal = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string] : string} = {} ) => {
+		createCsvInputModal_(app, headers, fileName, defaultValues);
 	}
 	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
 		return createCsvTableView_(csvTable);
 	}
-	createCsvFile = (filename: string, filePath: string, columnData: { name:string, type: string }[]) => {
-		createCsvFile_(this.app, filename, filePath, columnData);
+	createCsvFile = (filename: string, columnData: Header) => {
+		createCsvFile_(this.app, filename, columnData);
 	}
 
 	async onload() {

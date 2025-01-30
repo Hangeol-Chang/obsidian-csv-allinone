@@ -1,5 +1,6 @@
-import { CSVTable, Header } from './types'
-import { App, TFile } from 'obsidian';
+import { read } from 'fs';
+import { CSVTable, Header, isHeaderSame } from './types'
+import { App, Notice, TFile } from 'obsidian';
 
 // meta file을 수정하는 로직이 포함되어야 함.
 
@@ -10,31 +11,29 @@ export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | n
 		const csvContent = await loadFile(app, fileName);	// 파일 로드.
 
 		const lines = csvContent.split("\n").map(line => line.trim());
-		const headersString = lines.shift()?.split(",") ?? [];
+		const headersString: string[] = lines.shift()?.split(",") ?? [];
 		const rows = lines.map(line => line.split(",").map(cell => cell.trim()));
 
 		// read .csv.meta file,
 		// meta file 존재 여부 확인해서 없으면 생성.
 		if(await app.vault.adapter.exists(`${fileName}.meta`) == false) {
-			const headers: { name: string, type: string }[] = 
-				headersString.map((header) => ({ name: header, type: "string" }));
-
-			const metaContent = JSON.stringify(
-				headers.reduce((acc, col) => {
-					acc[col.name] = col.type;
-					return acc;
-				}, {} as Record<string, string>),
-				null,
-				2
+			const metaContent: string = (
+				JSON.stringify(headersString.reduce((meta, header: string) => {
+					meta[header] = {
+						type: "string",
+						default: "" 
+					};
+					return meta;
+				}, {} as Header), null, 2)
 			);
-			// const metaContent = JSON.stringify(headers, null, 2);
+
 			await saveFile(app, `${fileName}.meta`, metaContent);
+			new Notice(`meta file created : ${fileName}.meta`);
 		}
 		
-
 		// meta file 로드.
 		const metaData = await loadFile(app, `${fileName}.meta`);	// 메타 파일 로드.
-		const headers: Header[] = Object.entries(JSON.parse(metaData));
+		const headers: Header = Header(metaData);					// 메타 파일 파싱.
 
 		return await new CSVTable(headers, rows)	// CSV 파싱.
 	} else {
@@ -47,8 +46,9 @@ export const saveCSV_ = async (app: App, fileName: string, table: CSVTable): Pro
 		// contents, meta로 분리 필요.
 		const content = table.toCSV();
 		await saveFile(app, fileName, content);
-		// const meta = table.getMeta();
-		// await saveMetaFile(app, `${fileName}.meta`, meta);
+
+		const header = table.getHeaders();
+		await saveMetaFile(app, `${fileName}.meta`, header);
 	} else {
 		console.error(`file extension is not csv : ${fileName} (save)`);
 	}
@@ -70,8 +70,14 @@ const saveFile = async (app: App, fileName: string, content: string): Promise<vo
 		await vault.create(fileName, content);
 	}
 }
-const saveMetaFile = async (app: App, fileName: string, content: Header[]): Promise<void> => {
+const saveMetaFile = async (app: App, fileName: string, header1: Header): Promise<void> => {
+	const metaData = await loadFile(app, fileName);	// 메타 파일 로드.
+	const header2: Header = Header(metaData);		// 메타 파일 파싱.
 
+	if(!isHeaderSame(header1, header2)) {
+		const metaContent: string = JSON.stringify(header1, null, 2);
+		await saveFile(app, fileName, metaContent);
+	}
 }
 
 const loadFile = async (app: App, fileName: string): Promise<string> => {

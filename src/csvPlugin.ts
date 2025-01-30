@@ -1,10 +1,10 @@
 import { App, Modal } from "obsidian";
-import { CSVRow, CSVTable, Header } from "./types";
+import { CSVCellType, CSVRow, CSVTable, Header, HeaderContent } from "./types";
 import { readCSV_, saveCSV_ } from "./csvFilemanager";
 import './styles/csvPlugin.css';
 
-export const createCsvInputModal_ = async (app: App, headers: Header[], fileName: string) => {
-    const form = generateForm(fileName, headers);
+export const createCsvInputModal_ = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string]: string}) => {
+    const form = generateForm(fileName, headers, defaultValues);
     
     const modal = new Modal(app);
     modal.contentEl.empty();
@@ -19,10 +19,10 @@ export const createCsvInputModal_ = async (app: App, headers: Header[], fileName
         const formData = new FormData(formElement);
         
         const newRow: CSVRow = [];
-        for(const header of headers) {
-            newRow.push(formData.get(header[0]) as string);
+        for(const key of Object.keys(headers)) {
+            newRow.push(formData.get(key) as CSVCellType);
         }
-
+        
         // 파일 읽기
         const table = await readCSV_(app, fileName);
         if(table === null) {
@@ -37,7 +37,7 @@ export const createCsvInputModal_ = async (app: App, headers: Header[], fileName
     });
 }
 
-const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
+const generateForm = (fileName: string, headers: Header, defaultValues: {[key: string]: string}): HTMLFormElement => {
     const form = document.createElement("form");
     form.id = "csv-input-form";
 
@@ -57,10 +57,10 @@ const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
 
     // 폼 요소 생성
     // 입력 필드 생성 및 추가
-    headers.forEach(header => {
-        const field = createHeaderInputField(header);
+    for(const [key, value] of Object.entries(headers)) {
+        const field = createHeaderInputField(key, value, defaultValues[key] || "");
         form.appendChild(field);
-    });
+    };
 
     // 버튼 그룹 생성 및 추가
     const buttonGroup = document.createElement("div");
@@ -77,7 +77,7 @@ const generateForm = (fileName: string, headers: Header[]): HTMLFormElement => {
     return form;
 }
 
-const createHeaderInputField = (key: [string, string]): HTMLDivElement => {
+const createHeaderInputField = (key: string, headerContent: HeaderContent, defaultValue: string): HTMLDivElement => {
     // 입력 필드 래퍼 생성
     const formGroup = document.createElement("div");
     formGroup.className = "form-group";
@@ -85,20 +85,48 @@ const createHeaderInputField = (key: [string, string]): HTMLDivElement => {
     // 라벨 생성
     const label = document.createElement("label");
     label.className = "input-key";
-    label.htmlFor = key[0];
-    label.textContent = key[0];
+    label.htmlFor = key;
+    label.textContent = key;
+
+    formGroup.appendChild(label);
 
     // 입력 필드 생성
-    const input = document.createElement("input");
-    input.className = "input-value";
-    input.type = "text";
-    input.id = key[0];
-    input.name = key[0];
-    input.placeholder = key[1];
+    // select일 때와 아닐 때로 나눠야 함.
+
+
+    
+    if(headerContent.type === "select") {
+        const input = document.createElement("select");
+        input.className = "input-value";
+        input.id = key;
+        input.name = key;
+
+        if(!(headerContent.options === undefined)) {
+            // console.log(headerContent.options);
+            for(const option of headerContent.options) {
+                const optionElement = document.createElement("option");
+                optionElement.value = option;
+                optionElement.textContent = option;
+                input.appendChild(optionElement);
+            }
+        }
+        input.value = defaultValue;
+        
+        formGroup.appendChild(input);
+    }
+    else {
+        const input = document.createElement("input");
+        input.className = "input-value";
+        input.type = "text";
+        input.id = key;
+        input.name = key;
+        input.placeholder = headerContent.default.toString();
+        input.value = defaultValue;
+
+        formGroup.appendChild(input);
+    }
 
     // 요소 추가
-    formGroup.appendChild(label);
-    formGroup.appendChild(input);
 
     return formGroup;
 }
@@ -142,11 +170,11 @@ export const createCsvTableView_ = (csvTable: CSVTable): HTMLElement => {
     // 테이블 헤더 생성
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
-    headers.forEach(header => {
+    for(const key of Object.keys(headers)) {
         const th = document.createElement("th");
-        th.textContent = header[0];
+        th.textContent = key;
         headerRow.appendChild(th);
-    });
+    }
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
