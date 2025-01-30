@@ -1,111 +1,158 @@
 # Obsidian CSV All-in-One
-
-A plugin for handling `.csv` files, including creating, editing, and saving CSV data.
-
+> A plugin for creating `.csv` files, modifying their data, saving them, and performing various CSV-related operations.
 ----
 ## Other Language Docs
 - [Korean](./docs/README.kr.md)
-- Maybe add more later...
+- maybe add later...
 
 ## Brief Notice & Description
-> This plugin is designed to work in conjunction with `dataviewjs`.
-> Its primary purpose is to create CSV files and add data to them.
+> This plugin is built with the assumption that you are using DataviewJS.
+> The main purpose of this plugin is to create CSV files and add data to them.
 
 ----
 ## Examples
-### Using Obsidian Command
-#### Creating CSV File
+### With Obsidian Command
+#### Creating a CSV File
 
-- Press `Ctrl + P` -> Search for 'Create CSV Table'
-Enter the required data as shown below and click Submit.
+- Ctrl + P -> search for 'Create CSV Table'
+Enter the required data and click Submit as shown below:
 ![create_csv_table](./docs/images/create_csv_table.gif)
 
 #### Search CSV Files
-- UI is subject to updates.
-- Press `Ctrl + P` -> Search for 'Open CSV Explorer'
-- Move or delete CSV files.
+- UI modifications are planned
+- Ctrl + P -> search for 'Open CSV Explorer'
+- You can move or delete CSV files.
 
 ![csv_explorer](./docs/images/csv_explorer.png)
 
-### Using dataviewjs
+### With DataviewJS
 
-#### - View as Table
+#### - View as table
 - Source Code
-```dataviewjs
+```javascript
 const csvPlugin = app.plugins.plugins['csv-allinone'];
+
 const fileName = "HouseKeeping/t/2025-01.csv"; 
 
 csvPlugin.readCSV(app, fileName).then(res => {
-	const headers = res.headers.map(item => item[0]);
-	dv.table(headers, res.rows);
+	let headers = []
+	let defaultValues = {}
+	for(const [key, value] of Object.entries(res.headers)) {
+		headers.push(key)
+		defaultValues[key] = ""
+	}
+	const columnLength = headers.length;
+
+	let rows = []
+	for(const row of res.rows) {
+		const newRow = [row[0].slice(5), ...row.slice(1)]
+		rows.push(newRow);
+	}
+	dv.table(headers, rows);
 })
 ```
-- Output
+- Result
 ![view_csv_table](./docs/images/view_csv_table.png)
 
-#### - Add New Data (Row)
-> Requires the `buttons` plugin.
+
+#### - Add new data (row)
+> This feature uses the Buttons plugin.
+- Feature Description
+	- Adds a row to a specific CSV file.
+	- The data is not processed once read. If real-time updates are needed, you must wait for the file to update and read it again separately.
+	- Default values can be entered.
+
 - Source Code
-```dataviewjs
+```javascript
 const csvPlugin = app.plugins.plugins['csv-allinone'];
 const { createButton } = app.plugins.plugins["buttons"];
 
 const fileName = "HouseKeeping/t/2025-01.csv"; 
-
-const openCsvModal = async(app, headers, f) => {
-	 csvPlugin.openCsvInputModal(app, headers, f)
+const openCsvAppendModal = async(app, headers, f, defaults) => {
+	 csvPlugin.openCsvInputModal(app, headers, f, defaults)
 }
 
 csvPlugin.readCSV(app, fileName).then(res => {
-	const headers = res.headers.map(item => item[0]);
+	let headers = []
+	let defaultValues = {}
+	for(const [key, value] of Object.entries(res.headers)) {
+		headers.push(key)
+		defaultValues[key] = ""
+	}
+	const columnLength = headers.length;
+
+	let rows = []
+	for(const row of res.rows) {
+		const newRow = [row[0].slice(5), ...row.slice(1)]
+		rows.push(newRow);
+	}
+
+	dv.table(headers, rows);
+	// default values
+	defaultValues['Date'] = moment(Date.now()).format('YYYY-MM-DD');
+	defaultValues['Category'] = res.headers['Category'].options[0];
+	defaultValues['Description'] = '-' ;
+
 	dv.span(
 	    createButton({
 			app, el: this.container, 
-			args: { name: "open row input Modal", class: "" },
+			args: {
+				name: "open csv input modal",
+				class: ""
+			},
 			clickOverride: {
-				click: openCsvModal, params: [app, res.headers, fileName]
+				click: openCsvAppendModal, 
+				params: [app, res.headers, fileName, defaultValues]
 			}
 		})
 	)
 })
 ```
-- Output
+- Result
 ![add_row_to_table](./docs/images/add_row_to_table.gif)
 
-#### - Add New Column
-#### - Delete Existing Column
+#### - Add new column
+#### - Delete existing column
 
-### Using Templater
-- I don’t use Templater, so I’m not familiar with it. Sorry!
+
+### With Templater
+- I am not familiar with Templater, so I can't provide much detail. Apologies.
 
 ----
 ## Usage/Features
 
 ----
 ## APIs
-### Handle Files
-- `readCSV`
-	- Parameters: `(app: App, fileName: string)`
-	- Returns: `Promise<CSVTable | null>`
-	> Reads the specified `fileName` and returns a `CSVTable`.
+### Handle File
+- readCSV
+	- Parameters (app: App, fileName: string)
+	- Return: Promise<CSVTable | null>
+	> Takes a filename and returns the corresponding CSVTable.
 
-- `saveCSV`
-	- Parameters: `(app: App, fileName: string, table: CSVTable)`
-	- Returns: `void`
-	> Saves the given `CSVTable` data to the specified `fileName`.
+- saveCSV
+	- Parameters (app: App, fileName: string, table: CSVTable)
+	- Return: void
+	> Saves the CSVTable data into the given file.
 
-### CSVTable (Class)
-- Functions available in the class will be documented here.
+### CSVTable (class)
+-- Functions available within the class will be documented here.
 
-## How It Works
+#### Header (type)
+
+#### CSVRow (type)
+
+#### CSVCellType (type)
+
+
+## How it Works
 When you create a CSV file using this plugin, two files are generated: `.csv` and `.csv.meta`.
+If you load an existing CSV file, a `.csv.meta` file is generated automatically.
 
-If you load an existing CSV file, a `.csv.meta` file will be generated automatically.
-
-The `.csv` file contains basic table data, while the `.meta` file stores metadata about the columns, such as their attributes. In the current version (`v0.1.0`), the `.meta` file only stores the type of each column, but future updates will include features like data/select values, validity constraints, and more.
+The CSV file contains basic table data, while the `.meta` file contains information about each column's attributes.
+Currently (v0.1.0), the `.meta` file only stores column types, but in the future, it will include additional data, such as select values or validity checks.
 
 ## Contributing
-Any form of contribution is welcome.
+Feel free to contribute however you'd like. Contributions are always welcome!
 
 ## License
 - MIT
