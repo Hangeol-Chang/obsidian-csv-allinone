@@ -1,0 +1,30 @@
+{
+	"Date": {
+		"type": "stringData",
+		"default": "1970-01-01"
+	},
+	"Category": {
+		"type": "select",
+		"default": "",
+		"options": [
+			"food",
+			"cafe",
+			"shopping",
+			"transportation & vehicle",
+			"housing & utilities",
+			"culture & hobby"
+		]
+	},
+	"Item": {
+		"type": "string",
+		"default": ""
+	},
+	"Cost": {
+		"type": "number",
+		"default": 0
+	},
+	"Description": {
+		"type": "string",
+		"default": "-"
+	}
+}

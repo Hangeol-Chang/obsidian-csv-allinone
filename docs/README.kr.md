@@ -1,6 +1,5 @@
 # Obsidian CSV All-in-One
-
-.csv 파일을 생성하고, 내부의 데이터를 수정하고 저장하는 등 csv 관련된 작업을 처리하기 위한 플러그인입니다.
+> .csv 파일을 생성하고, 내부의 데이터를 수정하고 저장하는 등 csv 관련된 작업을 처리하기 위한 플러그인입니다.
 ----
 ## Other Language Docs
 -[english](../README.md)
@@ -30,13 +29,26 @@
 
 #### - view as table
 - 소스코드
-```dataviewjs
+```javascript
 const csvPlugin = app.plugins.plugins['csv-allinone'];
+
 const fileName = "HouseKeeping/t/2025-01.csv"; 
 
 csvPlugin.readCSV(app, fileName).then(res => {
-	const headers = res.headers.map(item => item[0]);
-	dv.table(headers, res.rows);
+	let headers = []
+	let defaultValues = {}
+	for(const [key, value] of Object.entries(res.headers)) {
+		headers.push(key)
+		defaultValues[key] = ""
+	}
+	const columnLength = headers.length;
+
+	let rows = []
+	for(const row of res.rows) {
+		const newRow = [row[0].slice(5), ...row.slice(1)]
+		rows.push(newRow);
+	}
+	dv.table(headers, rows);
 })
 ```
 - 결과물
@@ -45,25 +57,52 @@ csvPlugin.readCSV(app, fileName).then(res => {
 
 #### - add new data (row)
 > buttons 플러그인을 사용합니다.
+- 기능 설명
+	- 특정 csv 파일에 row를 추가합니다.
+	- 이미 읽힌 상태의 데이터를 가공하지 않습니다. 실시간 업데이트가 필요하다면, 별도로 파일 업데이트를 await하여 다시 파일을 읽어야합니다.
+	- defaultValue를 입력할 수 있습니다.
+
 - 소스코드
-```dataviewjs
+```javascript
 const csvPlugin = app.plugins.plugins['csv-allinone'];
 const { createButton } = app.plugins.plugins["buttons"];
 
 const fileName = "HouseKeeping/t/2025-01.csv"; 
-
-const openCsvModal = async(app, headers, f) => {
-	 csvPlugin.openCsvInputModal(app, headers, f)
+const openCsvAppendModal = async(app, headers, f, defaults) => {
+	 csvPlugin.openCsvInputModal(app, headers, f, defaults)
 }
 
 csvPlugin.readCSV(app, fileName).then(res => {
-	const headers = res.headers.map(item => item[0]);
+	let headers = []
+	let defaultValues = {}
+	for(const [key, value] of Object.entries(res.headers)) {
+		headers.push(key)
+		defaultValues[key] = ""
+	}
+	const columnLength = headers.length;
+
+	let rows = []
+	for(const row of res.rows) {
+		const newRow = [row[0].slice(5), ...row.slice(1)]
+		rows.push(newRow);
+	}
+
+	dv.table(headers, rows);
+	// default values
+	defaultValues['Date'] = moment(Date.now()).format('YYYY-MM-DD');
+	defaultValues['Category'] = res.headers['Category'].options[0];
+	defaultValues['Description'] = '-';
+
 	dv.span(
 	    createButton({
 			app, el: this.container, 
-			args: { name: "open row input Modal", class: "" },
+			args: {
+				name: "open csv input modal",
+				class: ""
+			},
 			clickOverride: {
-				click: openCsvModal, params: [app, res.headers, fileName]
+				click: openCsvAppendModal, 
+				params: [app, res.headers, fileName, defaultValues]
 			}
 		})
 	)
@@ -97,6 +136,12 @@ csvPlugin.readCSV(app, fileName).then(res => {
 
 ### CSVTable (class)
 -- class에서 할 수 있는 함수들 작성해둘 것.
+
+#### Header (type)
+
+#### CSVRow (type)
+
+#### CSVCellType(type)
 
 
 ## How it work
