@@ -54,6 +54,16 @@ hr {
     border-bottom: 1px solid #777;
 }
 
+.colgroup-name {
+    width: 25%;
+}
+.colgroup-type {
+    width: 25%;
+}
+.colgroup-value {
+    width: 50%;
+}
+
 .colname-input {
     padding: 2px;
     width: 100%; height: 30px;
@@ -92,4 +102,11 @@ hr {
     font-size: 1rem;
     font-family: var(--font-monospace);
     color: var(--text-normal);
+}
+
+.colinput-block {
+    display: block;
+}
+.colinput-none {
+    display: none;
 }
