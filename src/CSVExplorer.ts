@@ -35,7 +35,7 @@ export default class CSVExplorerModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        contentEl.createEl("h2", { text: "CSV Explorer" });
+        contentEl.createEl("h2", { text: "CSV explorer" });
         
         Object.keys(this.CSVStructure).forEach((folder) => {
             contentEl.createEl("h3", { text: folder });

@@ -169,7 +169,7 @@ export default class CSVCreateModal extends Modal {
     // common api
     onOpen() {
         let {contentEl} = this;
-        contentEl.createEl('h2', {text: 'Create CSV Table'});
+        contentEl.createEl('h2', {text: 'Create CSV table'});
         let hr1 = contentEl.createEl('hr');
         hr1.classList.add('horizon-line');
 
@@ -186,7 +186,7 @@ export default class CSVCreateModal extends Modal {
         filePathEl.classList.add('filepath-input');
 
         // add column button
-        let addColumnButton = contentEl.createEl('button', {text: 'Add Column'});
+        let addColumnButton = contentEl.createEl('button', {text: 'Add column'});
         addColumnButton.addEventListener('click', () => { this.addColumn(); });
 
         // column making table
@@ -205,9 +205,9 @@ export default class CSVCreateModal extends Modal {
         let tHeadRow = tHead.createEl('tr');
         tHeadRow.classList.add('columns-table-header');
 
-        tHeadRow.createEl('th', {text: 'Column Name'});
+        tHeadRow.createEl('th', {text: 'Column name'});
         tHeadRow.createEl('th', {text: 'Type'});
-        tHeadRow.createEl('th', {text: 'Default Value'});
+        tHeadRow.createEl('th', {text: 'Default value'});
             
         this.columnsWrapper = columnsTable.createEl('tbody');
         this.columnsWrapper.classList.add('columns-wrapper');

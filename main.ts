@@ -49,7 +49,7 @@ export default class CSVPlugin extends Plugin {
 		// commands
 		this.addCommand({
 			id: "create-CSV-table",
-			name: "Create CSV Table",
+			name: "Create CSV table",
 			callback: () => {
 				new CSVCreateModal(this.app).open();
 			},
@@ -57,7 +57,7 @@ export default class CSVPlugin extends Plugin {
 
 		this.addCommand({
 			id: "open-CSV-explorer",
-			name: "Open CSV Explorer",
+			name: "Open CSV explorer",
 			callback: async () => {
 				const CSVStructure = await getCSVFileStructure(this.app);
 				new CSVExplorerModal(this.app, CSVStructure).open();
