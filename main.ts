@@ -41,7 +41,7 @@ export default class CSVPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		// window에서 독립적으로 실행할 함수들.
-		(window as any).csvTable = CSVTable;
+		(window as any).CSVTable = CSVTable;
 		
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new CSVSettingTab(this.app, this));

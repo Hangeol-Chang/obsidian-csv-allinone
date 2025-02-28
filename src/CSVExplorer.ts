@@ -28,7 +28,7 @@ export default class CSVExplorerModal extends Modal {
 
     constructor(app: App, CSVStructure: Record<string, string[]>) {
         super(app);
-        this.csvStructure = CSVStructure;
+        this.CSVStructure = CSVStructure;
     }
 
     onOpen() {
@@ -37,9 +37,9 @@ export default class CSVExplorerModal extends Modal {
 
         contentEl.createEl("h2", { text: "CSV Explorer" });
         
-        Object.keys(this.csvStructure).forEach((folder) => {
+        Object.keys(this.CSVStructure).forEach((folder) => {
             contentEl.createEl("h3", { text: folder });
-            this.csvStructure[folder].forEach((file) => {
+            this.CSVStructure[folder].forEach((file) => {
                 contentEl.createEl("p", { text: file });
             });
         });

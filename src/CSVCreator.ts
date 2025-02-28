@@ -170,7 +170,8 @@ export default class CSVCreateModal extends Modal {
     onOpen() {
         let {contentEl} = this;
         contentEl.createEl('h2', {text: 'Create CSV Table'});
-        contentEl.createEl('hr');
+        let hr1 = contentEl.createEl('hr');
+        hr1.classList.add('horizon-line');
 
         // file setting
         let filenameContainer = contentEl.createEl('div');
@@ -212,7 +213,8 @@ export default class CSVCreateModal extends Modal {
         this.columnsWrapper.classList.add('columns-wrapper');
 
         // submit button
-        contentEl.createEl('hr');
+        let hr2 = contentEl.createEl('hr');
+        hr2.classList.add('horizon-line');
         let buttonEl = contentEl.createEl('button', {text: 'Create'});
         buttonEl.addEventListener('click', () => { 
             event?.preventDefault();
