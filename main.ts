@@ -8,15 +8,15 @@ import { CSVTable, Header } from './src/types'
 import CSVExplorerModal, { getCSVFileStructure } from 'src/CSVExplorer';
 import CSVCreateModal, { createCSVFile_ } from 'src/CSVCreator';
 
-interface CSVPluginSettings {
-	mySetting: string;
-}
-const DEFAULT_SETTINGS: CSVPluginSettings = {
-	mySetting: 'default'
-}
+// interface CSVPluginSettings {
+// 	mySetting: string;
+// }
+// const DEFAULT_SETTINGS: CSVPluginSettings = {
+// 	mySetting: 'default'
+// }
 
 export default class CSVPlugin extends Plugin {
-	settings: CSVPluginSettings;
+	// settings: CSVPluginSettings;
 
 	// CSVPlugin.function() 형태로 호출될 함수들.
 	//// filemanager.ts
@@ -39,12 +39,12 @@ export default class CSVPlugin extends Plugin {
 	}
 
 	async onload() {
-		await this.loadSettings();
+		// await this.loadSettings();
+
 		// window에서 독립적으로 실행할 함수들.
 		(window as any).CSVTable = CSVTable;
 		
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new CSVSettingTab(this.app, this));
+		// this.addSettingTab(new CSVSettingTab(this.app, this));
 
 		// commands
 		this.addCommand({
@@ -66,14 +66,16 @@ export default class CSVPlugin extends Plugin {
 	}
 	onunload() {}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+	// async loadSettings() {
+	// 	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	// }
+
+	// async saveSettings() {
+	// 	await this.saveData(this.settings);
+	// }
 }
 
+/*
 class CSVSettingTab extends PluginSettingTab {
 	plugin: CSVPlugin;
 
@@ -99,3 +101,4 @@ class CSVSettingTab extends PluginSettingTab {
 				}));
 	}
 }
+*/
