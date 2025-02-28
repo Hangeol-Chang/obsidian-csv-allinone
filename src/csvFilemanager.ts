@@ -8,9 +8,9 @@ import { App, Notice, TFile } from 'obsidian';
 export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | null> => {
 	if(fileName.endsWith(".csv")) {	// 확장자 검사.
 		// read .csv file,
-		const csvContent = await loadFile(app, fileName);	// 파일 로드.
+		const CSVContent = await loadFile(app, fileName);	// 파일 로드.
 
-		const lines = csvContent.split("\n").map(line => line.trim());
+		const lines = CSVContent.split("\n").map(line => line.trim());
 		const headersString: string[] = lines.shift()?.split(",") ?? [];
 		const rows = lines.map(line => line.split(",").map(cell => cell.trim()));
 
@@ -37,7 +37,7 @@ export const readCSV_ = async (app: App, fileName: string): Promise<CSVTable | n
 
 		return await new CSVTable(headers, rows)	// CSV 파싱.
 	} else {
-		console.error(`file extension is not csv : ${fileName} (read)`);
+		console.error(`file extension is not CSV : ${fileName} (read)`);
 	}
 	return null;
 }
@@ -50,7 +50,7 @@ export const saveCSV_ = async (app: App, fileName: string, table: CSVTable): Pro
 		const header = table.getHeaders();
 		await saveMetaFile(app, `${fileName}.meta`, header);
 	} else {
-		console.error(`file extension is not csv : ${fileName} (save)`);
+		console.error(`file extension is not CSV : ${fileName} (save)`);
 	}
 	return;
 }

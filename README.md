@@ -16,25 +16,25 @@
 
 - Ctrl + P -> search for 'Create CSV Table'
 Enter the required data and click Submit as shown below:
-![create_csv_table](./docs/images/create_csv_table.gif)
+![create_CSV_table](./docs/images/create_CSV_table.gif)
 
 #### Search CSV Files
 - UI modifications are planned
 - Ctrl + P -> search for 'Open CSV Explorer'
 - You can move or delete CSV files.
 
-![csv_explorer](./docs/images/csv_explorer.png)
+![CSV_explorer](./docs/images/CSV_explorer.png)
 
 ### With DataviewJS
 
 #### - View as table
 - Source Code
 ```javascript
-const csvPlugin = app.plugins.plugins['csv-allinone'];
+const CSVPlugin = app.plugins.plugins['CSV-allinone'];
 
 const fileName = "HouseKeeping/t/2025-01.csv"; 
 
-csvPlugin.readCSV(app, fileName).then(res => {
+CSVPlugin.readCSV(app, fileName).then(res => {
 	let headers = []
 	let defaultValues = {}
 	for(const [key, value] of Object.entries(res.headers)) {
@@ -52,7 +52,7 @@ csvPlugin.readCSV(app, fileName).then(res => {
 })
 ```
 - Result
-![view_csv_table](./docs/images/view_csv_table.png)
+![view_CSV_table](./docs/images/view_CSV_table.png)
 
 
 #### - Add new data (row)
@@ -64,15 +64,15 @@ csvPlugin.readCSV(app, fileName).then(res => {
 
 - Source Code
 ```javascript
-const csvPlugin = app.plugins.plugins['csv-allinone'];
+const CSVPlugin = app.plugins.plugins['CSV-allinone'];
 const { createButton } = app.plugins.plugins["buttons"];
 
 const fileName = "HouseKeeping/t/2025-01.csv"; 
-const openCsvAppendModal = async(app, headers, f, defaults) => {
-	 csvPlugin.openCsvInputModal(app, headers, f, defaults)
+const openCSVAppendModal = async(app, headers, f, defaults) => {
+	 CSVPlugin.openCSVInputModal(app, headers, f, defaults)
 }
 
-csvPlugin.readCSV(app, fileName).then(res => {
+CSVPlugin.readCSV(app, fileName).then(res => {
 	let headers = []
 	let defaultValues = {}
 	for(const [key, value] of Object.entries(res.headers)) {
@@ -97,11 +97,11 @@ csvPlugin.readCSV(app, fileName).then(res => {
 	    createButton({
 			app, el: this.container, 
 			args: {
-				name: "open csv input modal",
+				name: "open CSV input modal",
 				class: ""
 			},
 			clickOverride: {
-				click: openCsvAppendModal, 
+				click: openCSVAppendModal, 
 				params: [app, res.headers, fileName, defaultValues]
 			}
 		})
