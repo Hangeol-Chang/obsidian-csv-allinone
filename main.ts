@@ -1,5 +1,6 @@
 import { 
-	App, Plugin, PluginSettingTab, Setting,
+	App, Plugin, 
+	// PluginSettingTab, Setting,
 } from 'obsidian';
 
 import { createCSVInputModal_, createCSVTableView_ } from './src/CSVPlugin';
