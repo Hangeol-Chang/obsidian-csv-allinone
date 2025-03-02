@@ -30,7 +30,7 @@
     background-color: var(--background-secondary);
 }
 
-hr {
+.horizon-line {
     margin: 5px 0;
     border: 0;
     width: 100%;

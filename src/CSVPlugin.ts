@@ -1,9 +1,9 @@
 import { App, Modal } from "obsidian";
 import { CSVCellType, CSVRow, CSVTable, Header, HeaderContent } from "./types";
-import { readCSV_, saveCSV_ } from "./csvFilemanager";
-import './styles/csvPlugin.css';
+import { readCSV_, saveCSV_ } from "./CSVFilemanager";
+import './styles/CSVPlugin.css';
 
-export const createCsvInputModal_ = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string]: string}) => {
+export const createCSVInputModal_ = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string]: string}) => {
     const form = generateForm(fileName, headers, defaultValues);
     
     const modal = new Modal(app);
@@ -12,7 +12,7 @@ export const createCsvInputModal_ = async (app: App, headers: Header, fileName: 
     modal.open();
 
     // 파일을 새로 읽어서, 추가된 라인을 포함 저장.
-    const formElement = modal.contentEl.querySelector('#csv-input-form') as HTMLFormElement;
+    const formElement = modal.contentEl.querySelector('#CSV-input-form') as HTMLFormElement;
     formElement.addEventListener('submit', async (event) => {
         event.preventDefault(); // 기본 제출 동작 방지
         // 입력 값 처리 가져오기.
@@ -39,7 +39,7 @@ export const createCsvInputModal_ = async (app: App, headers: Header, fileName: 
 
 const generateForm = (fileName: string, headers: Header, defaultValues: {[key: string]: string}): HTMLFormElement => {
     const form = document.createElement("form");
-    form.id = "csv-input-form";
+    form.id = "CSV-input-form";
 
     const fileNameArray = fileName.split('/');
     const fileNameShort = fileNameArray[fileNameArray.length - 1];
@@ -156,9 +156,9 @@ const createInputField = (key: string): HTMLDivElement => {
     return formGroup;
 }
 
-export const createCsvTableView_ = (csvTable: CSVTable): HTMLElement => {
-    const headers = csvTable.getHeaders();
-    const rows = csvTable.getRows();
+export const createCSVTableView_ = (CSVTable: CSVTable): HTMLElement => {
+    const headers = CSVTable.getHeaders();
+    const rows = CSVTable.getRows();
 
     // 테이블 래퍼 생성
     const tableWrapper = document.createElement("div");

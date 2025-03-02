@@ -9,7 +9,7 @@ SOURCE_FILES = {
 }
 
 OBSIDIAN_DIR = os.path.abspath('../obsidian/.obsidian')
-TARGET_DIR = os.path.join(OBSIDIAN_DIR, 'plugins', 'csv-allinone')
+TARGET_DIR = os.path.join(OBSIDIAN_DIR, 'plugins', 'CSV-allinone')
 
 def copy_files():
     # Obsidian 폴더 확인
@@ -17,7 +17,7 @@ def copy_files():
         print(f"Error: Obsidian directory not found at {OBSIDIAN_DIR}")
         return
 
-    # csv-allinone 폴더가 없으면 생성
+    # CSV-allinone 폴더가 없으면 생성
     if not os.path.exists(TARGET_DIR):
         print(f"Creating target directory: {TARGET_DIR}")
         os.makedirs(TARGET_DIR, exist_ok=True)

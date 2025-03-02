@@ -124,11 +124,11 @@ export class CSVTable {
     }
 
     toCSV(): string {
-        const csvContent = [Object.keys(this.headers).join(",")];
+        const CSVContent = [Object.keys(this.headers).join(",")];
         for (const row of this.rows) {
-            csvContent.push(row.map(cell => (cell === null ? "" : cell.toString())).join(","));
+            CSVContent.push(row.map(cell => (cell === null ? "" : cell.toString())).join(","));
         }
-        return csvContent.join("\n");
+        return CSVContent.join("\n");
     }
 
     addColumn(columnName: string, columnType: CSVCellType, value: CSVCell = 0): void {

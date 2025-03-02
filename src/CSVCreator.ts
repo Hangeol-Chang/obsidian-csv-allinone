@@ -1,16 +1,16 @@
 import { App, Modal, Notice, Plugin } from 'obsidian';
-import './styles/csvCreator.css';
+import './styles/CSVCreator.css';
 import { CSVCellType, CSVCellTypeString, Header } from './types';
 
 // dataviewjs 등으로 자동적으로 파일을 생성하게 할 때 사용할 수 있는 api
-export const createCsvFile_ = (app: App, filename: string, columnData: Header) : boolean => {
+export const createCSVFile_ = (app: App, filename: string, columnData: Header) : boolean => {
     // 수정해야함.
     // .csv 내용 생성 (헤더만 추가)
-    let csvContent = '';
+    let CSVContent = '';
     for(const key of Object.keys(columnData)) {
-        csvContent += key + ',';
+        CSVContent += key + ',';
     }
-    csvContent = csvContent.slice(0, -1) + '\n';
+    CSVContent = CSVContent.slice(0, -1) + '\n';
 
     // .csv.meta 내용 생성
     const metaContent = JSON.stringify(columnData, null, 2);
@@ -19,7 +19,7 @@ export const createCsvFile_ = (app: App, filename: string, columnData: Header) :
     const vault = app.vault;
 
     // .csv 파일 저장
-    vault.adapter.write(`${filename}.csv`, csvContent).then(() => {
+    vault.adapter.write(`${filename}.csv`, CSVContent).then(() => {
         new Notice(`${filename}.csv file has been created.`);
     }).catch((err) => {
         new Notice(`Error occurred while creating .csv file:\n${err}`);
@@ -36,7 +36,7 @@ export const createCsvFile_ = (app: App, filename: string, columnData: Header) :
     return true;
 }
 
-export default class CsvCreateModal extends Modal {
+export default class CSVCreateModal extends Modal {
 
     columnsWrapper: HTMLElement;
 
@@ -94,7 +94,7 @@ export default class CsvCreateModal extends Modal {
         });
     }
 
-    createCsvFile() {
+    createCSVFile() {
         // .csv 파일 생성
         const { contentEl } = this;
 
@@ -163,14 +163,15 @@ export default class CsvCreateModal extends Modal {
             new Notice('add at least one column');
             return false;
         }
-        return createCsvFile_(this.app, fullFilePath, columnData);
+        return createCSVFile_(this.app, fullFilePath, columnData);
     }
 
     // common api
     onOpen() {
         let {contentEl} = this;
-        contentEl.createEl('h2', {text: 'Create CSV Table'});
-        contentEl.createEl('hr');
+        contentEl.createEl('h2', {text: 'Create CSV table'});
+        let hr1 = contentEl.createEl('hr');
+        hr1.classList.add('horizon-line');
 
         // file setting
         let filenameContainer = contentEl.createEl('div');
@@ -185,7 +186,7 @@ export default class CsvCreateModal extends Modal {
         filePathEl.classList.add('filepath-input');
 
         // add column button
-        let addColumnButton = contentEl.createEl('button', {text: 'Add Column'});
+        let addColumnButton = contentEl.createEl('button', {text: 'Add column'});
         addColumnButton.addEventListener('click', () => { this.addColumn(); });
 
         // column making table
@@ -204,19 +205,20 @@ export default class CsvCreateModal extends Modal {
         let tHeadRow = tHead.createEl('tr');
         tHeadRow.classList.add('columns-table-header');
 
-        tHeadRow.createEl('th', {text: 'Column Name'});
+        tHeadRow.createEl('th', {text: 'Column name'});
         tHeadRow.createEl('th', {text: 'Type'});
-        tHeadRow.createEl('th', {text: 'Default Value'});
+        tHeadRow.createEl('th', {text: 'Default value'});
             
         this.columnsWrapper = columnsTable.createEl('tbody');
         this.columnsWrapper.classList.add('columns-wrapper');
 
         // submit button
-        contentEl.createEl('hr');
+        let hr2 = contentEl.createEl('hr');
+        hr2.classList.add('horizon-line');
         let buttonEl = contentEl.createEl('button', {text: 'Create'});
         buttonEl.addEventListener('click', () => { 
             event?.preventDefault();
-            const result = this.createCsvFile(); 
+            const result = this.createCSVFile(); 
             if(result) {
                 this.close();
             }

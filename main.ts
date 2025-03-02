@@ -1,24 +1,25 @@
 import { 
-	App, Plugin, PluginSettingTab, Setting,
+	App, Plugin, 
+	// PluginSettingTab, Setting,
 } from 'obsidian';
 
-import { createCsvInputModal_, createCsvTableView_ } from './src/csvPlugin';
-import { readCSV_, saveCSV_} from 'src/csvFilemanager';
+import { createCSVInputModal_, createCSVTableView_ } from './src/CSVPlugin';
+import { readCSV_, saveCSV_} from 'src/CSVFilemanager';
 import { CSVTable, Header } from './src/types'
-import CsvExplorerModal, { getCsvFileStructure } from 'src/csvExplorer';
-import CsvCreateModal, { createCsvFile_ } from 'src/csvCreator';
+import CSVExplorerModal, { getCSVFileStructure } from 'src/CSVExplorer';
+import CSVCreateModal, { createCSVFile_ } from 'src/CSVCreator';
 
-interface CsvPluginSettings {
-	mySetting: string;
-}
-const DEFAULT_SETTINGS: CsvPluginSettings = {
-	mySetting: 'default'
-}
+// interface CSVPluginSettings {
+// 	mySetting: string;
+// }
+// const DEFAULT_SETTINGS: CSVPluginSettings = {
+// 	mySetting: 'default'
+// }
 
-export default class CsvPlugin extends Plugin {
-	settings: CsvPluginSettings;
+export default class CSVPlugin extends Plugin {
+	// settings: CSVPluginSettings;
 
-	// CsvPlugin.function() 형태로 호출될 함수들.
+	// CSVPlugin.function() 형태로 호출될 함수들.
 	//// filemanager.ts
 	readCSV = async (app: App, fileName: string): Promise<CSVTable | null> => {
 		return readCSV_(app, fileName);
@@ -27,57 +28,59 @@ export default class CsvPlugin extends Plugin {
 		return saveCSV_(app, fileName, table);
 	}
 
-	//// csvdisplay.ts
-	openCsvInputModal = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string] : string} = {} ) => {
-		createCsvInputModal_(app, headers, fileName, defaultValues);
+	//// CSVdisplay.ts
+	openCSVInputModal = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string] : string} = {} ) => {
+		createCSVInputModal_(app, headers, fileName, defaultValues);
 	}
-	createCsvTableView = (csvTable: CSVTable): HTMLElement => {
-		return createCsvTableView_(csvTable);
+	createCSVTableView = (CSVTable: CSVTable): HTMLElement => {
+		return createCSVTableView_(CSVTable);
 	}
-	createCsvFile = (filename: string, columnData: Header) => {
-		createCsvFile_(this.app, filename, columnData);
+	createCSVFile = (filename: string, columnData: Header) => {
+		createCSVFile_(this.app, filename, columnData);
 	}
 
 	async onload() {
-		await this.loadSettings();
+		// await this.loadSettings();
+
 		// window에서 독립적으로 실행할 함수들.
 		(window as any).CSVTable = CSVTable;
 		
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new CsvSettingTab(this.app, this));
+		// this.addSettingTab(new CSVSettingTab(this.app, this));
 
 		// commands
 		this.addCommand({
-			id: "create-csv-table",
-			name: "Create CSV Table",
+			id: "create-CSV-table",
+			name: "Create CSV table",
 			callback: () => {
-				new CsvCreateModal(this.app).open();
+				new CSVCreateModal(this.app).open();
 			},
 		});
 
 		this.addCommand({
-			id: "open-csv-explorer",
-			name: "Open CSV Explorer",
+			id: "open-CSV-explorer",
+			name: "Open CSV explorer",
 			callback: async () => {
-				const csvStructure = await getCsvFileStructure(this.app);
-				new CsvExplorerModal(this.app, csvStructure).open();
+				const CSVStructure = await getCSVFileStructure(this.app);
+				new CSVExplorerModal(this.app, CSVStructure).open();
 			}
 		})
 	}
 	onunload() {}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+	// async loadSettings() {
+	// 	this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	// }
+
+	// async saveSettings() {
+	// 	await this.saveData(this.settings);
+	// }
 }
 
-class CsvSettingTab extends PluginSettingTab {
-	plugin: CsvPlugin;
+/*
+class CSVSettingTab extends PluginSettingTab {
+	plugin: CSVPlugin;
 
-	constructor(app: App, plugin: CsvPlugin) {
+	constructor(app: App, plugin: CSVPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -99,3 +102,4 @@ class CsvSettingTab extends PluginSettingTab {
 				}));
 	}
 }
+*/
