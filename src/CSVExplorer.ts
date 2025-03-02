@@ -10,7 +10,7 @@ export const getCSVFileStructure = async (app: App): Promise<Record<string, stri
 
     // Vault 내의 모든 파일 순회
     files.forEach((file: TFile) => {
-        if (file.extension === "CSV") {
+        if (file.extension === "csv") {
             if(file.parent) {
                 const folderPath = file.parent.path;
                 if (!CSVStructure[folderPath])
