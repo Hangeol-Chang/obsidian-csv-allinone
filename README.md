@@ -1,4 +1,4 @@
-# Obsidian CSV All-in-One
+# CSV All-in-One
 > A plugin for creating `.csv` files, modifying their data, saving them, and performing various CSV-related operations.
 ----
 ## Other Language Docs
