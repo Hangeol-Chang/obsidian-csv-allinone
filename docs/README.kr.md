@@ -16,14 +16,14 @@
 
 - Ctrl + P -> 'Create CSV Table' 검색
 아래처럼 필요한 데이터를 입력 후 Submit
-![create_CSV_table](./images/create_CSV_table.gif)
+![create_CSV_table](./images/create_csv_table.gif)
 
 #### Search CSV Files
 - UI 수정 예정
 - Ctrl + P -> 'Open CSV Explorer' 검색
 - CSV 파일의 위치 이동, 삭제가 가능.
 
-![CSV_explorer](./images/CSV_explorer.png)
+![CSV_explorer](./images/csv_explorer.png)
 
 ### with dataviewjs
 
@@ -52,7 +52,7 @@ CSVPlugin.readCSV(app, fileName).then(res => {
 })
 ```
 - 결과물
-![view_CSV_table](./images/view_CSV_table.png)
+![view_CSV_table](./images/view_csv_table.png)
 
 
 #### - add new data (row)
