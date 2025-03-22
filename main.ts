@@ -5,7 +5,7 @@ import {
 
 import { createCSVInputModal_, createCSVTableView_ } from './src/CSVPlugin';
 import { readCSV_, saveCSV_} from 'src/CSVFilemanager';
-import { CSVTable, Header } from './src/types'
+import { CSVRow, CSVTable, Header } from './src/types'
 import CSVExplorerModal, { getCSVFileStructure } from 'src/CSVExplorer';
 import CSVCreateModal, { createCSVFile_ } from 'src/CSVCreator';
 
@@ -28,6 +28,14 @@ export default class CSVPlugin extends Plugin {
 		return saveCSV_(app, fileName, table);
 	}
 
+	addRow = async (app: App, fileName: string, rows: CSVRow[]) => {
+		// readCSV_로 읽어서, rows 추가 후 saveCSV_로 저장.
+		const table = await readCSV_(app, fileName);
+		if(table) {
+			for(const row of rows) table.append(row);
+			await saveCSV_(app, fileName, table);
+		}
+	}
 	//// CSVdisplay.ts
 	openCSVInputModal = async (app: App, headers: Header, fileName: string, defaultValues: {[key: string] : string} = {} ) => {
 		createCSVInputModal_(app, headers, fileName, defaultValues);
