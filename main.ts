@@ -4,7 +4,7 @@ import {
 } from 'obsidian';
 
 import { createCSVInputModal_, createCSVTableView_ } from './src/CSVPlugin';
-import { readCSV_, saveCSV_} from 'src/CSVFilemanager';
+import { readCSV_, saveCSV_, readCSVs_ } from 'src/CSVFilemanager';
 import { CSVRow, CSVTable, Header } from './src/types'
 import CSVExplorerModal, { getCSVFileStructure } from 'src/CSVExplorer';
 import CSVCreateModal, { createCSVFile_ } from 'src/CSVCreator';
@@ -28,6 +28,11 @@ export default class CSVPlugin extends Plugin {
 		return saveCSV_(app, fileName, table);
 	}
 
+	readCSVs = async (app: App, filePath: string, filter: string): Promise< { key: string; value: CSVTable }[] | null> => {
+		// filter의 정규식에 맞는 파일들을 읽어와서 return;
+		return readCSVs_(app, filePath, filter);
+	}
+
 	addRow = async (app: App, fileName: string, rows: CSVRow[]) => {
 		// readCSV_로 읽어서, rows 추가 후 saveCSV_로 저장.
 		const table = await readCSV_(app, fileName);
@@ -45,6 +50,15 @@ export default class CSVPlugin extends Plugin {
 	}
 	createCSVFile = (filename: string, columnData: Header) => {
 		createCSVFile_(this.app, filename, columnData);
+	}
+
+	fileExists = async (app: App, fileName: string): Promise<boolean> => {
+		const file = app.vault.getAbstractFileByPath(fileName);
+		if(file) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	async onload() {

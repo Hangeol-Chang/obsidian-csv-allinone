@@ -55,6 +55,28 @@ export const saveCSV_ = async (app: App, fileName: string, table: CSVTable): Pro
 	return;
 }
 
+export const readCSVs_ = async (app: App, filePath: string, filter: string): Promise<{ key: string; value: CSVTable }[] | null> => {
+	// filter의 정규식에 맞는 파일들을 읽어와서 return;
+	const vault = app.vault;
+	const files = vault.getFiles();
+	console.log(`readCSVs_ : ${filePath}, filter: ${filter}`);
+	console.log(files);
+	const csvFiles: { key: string; value: CSVTable }[] = [];
+
+	for(const file of files) {
+		if(file.path.startsWith(filePath) && file.path.endsWith('.csv') && file.name.match(filter)) {
+			const table = await readCSV_(app, file.path);
+			if(table) csvFiles.push({ key: file.name, value: table });
+		}
+	}
+
+	if(csvFiles.length > 0) {
+		return csvFiles;
+	} else {
+		return null;
+	}
+}
+
 // save, load
 const saveFile = async (app: App, fileName: string, content: string): Promise<void> => {
 	const vault = app.vault;
