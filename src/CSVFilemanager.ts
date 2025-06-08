@@ -59,8 +59,6 @@ export const readCSVs_ = async (app: App, filePath: string, filter: string): Pro
 	// filter의 정규식에 맞는 파일들을 읽어와서 return;
 	const vault = app.vault;
 	const files = vault.getFiles();
-	console.log(`readCSVs_ : ${filePath}, filter: ${filter}`);
-	console.log(files);
 	const csvFiles: { key: string; value: CSVTable }[] = [];
 
 	for(const file of files) {

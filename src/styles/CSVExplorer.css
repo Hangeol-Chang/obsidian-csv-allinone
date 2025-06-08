@@ -1,0 +1,8 @@
+
+.file-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    justify-content: space-between;
+    margin-left: 10px;
+}
