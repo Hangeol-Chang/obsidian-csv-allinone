@@ -1,4 +1,5 @@
 import { App, Modal, TFile } from 'obsidian';
+import './styles/CSVExplorer.css';
 
 /*
     obsidian 탐색기에서 CSV 파일이 표시가 안되기 때문에,\
@@ -40,7 +41,26 @@ export default class CSVExplorerModal extends Modal {
         Object.keys(this.CSVStructure).forEach((folder) => {
             contentEl.createEl("h3", { text: folder });
             this.CSVStructure[folder].forEach((file) => {
-                contentEl.createEl("p", { text: file });
+                const fileRow = contentEl.createEl("div", { cls: "file-row"});
+
+                // file name
+                fileRow.createEl("p", { text: file });
+
+                // file delete button
+                const bt = fileRow.createEl("button", { text: "Delete" });
+                bt.addEventListener("click", async () => {
+                    const fileToDelete = this.CSVStructure[folder].find(f => f === file);
+                    if (fileToDelete) {
+                        const filePath = `${folder}/${fileToDelete}`;
+                        const fileObj = this.app.vault.getAbstractFileByPath(filePath);
+                        if (fileObj && fileObj instanceof TFile) {
+                            await this.app.vault.delete(fileObj);
+                            // Update the structure after deletion
+                            this.CSVStructure[folder] = this.CSVStructure[folder].filter(f => f !== fileToDelete);
+                            this.onOpen(); // Refresh the modal content
+                        }
+                    }
+                });
             });
         });
     }
